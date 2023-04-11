@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 
 public final class Time {
 
+    private static final String DEFAULT_DATE_FORMAT = "MM/dd/yyy";
+
     /*
     DATE MODIFIERS
      */
@@ -403,7 +405,7 @@ public final class Time {
      * @throws IllegalArgumentException when this method fails to parse the input into a date
      */
     public static @NotNull Date parseDate(@NotNull String input) {
-        return parseDate("MM/dd/yyyy", input);
+        return parseDate(DEFAULT_DATE_FORMAT, input);
     }
 
     /*
@@ -463,6 +465,10 @@ public final class Time {
                 throw new IllegalArgumentException("Invalid interval format provided: " + input);
         }
     }
+
+    /*
+    DATE COMPARING
+     */
 
     /**
      * A method used to test whether a date is before a different date.
