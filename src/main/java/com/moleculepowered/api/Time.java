@@ -6,10 +6,12 @@ import org.jetbrains.annotations.NotNull;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class Time {
 
@@ -580,6 +582,101 @@ public final class Time {
         Validate.notNull(target, "The target date cannot be null!");
         Validate.notNull(comparedTo, "The compared to date cannot be null!");
         return target.after(parseDate(comparedTo));
+    }
+
+    /*
+    TIME REMAINING
+     */
+
+    /**
+     * A method used to return the amount of time remaining until a specified date. if any of the values
+     * listed in the format below return 0, this method will remove it from the returned string
+     * <br><br/>
+     * <strong>String Format: year(s) day(s) hour(s) minute(s) second(s).</strong>
+     *
+     * @param start Starting date
+     * @param end   Target date
+     * @return Time until target date.
+     */
+    public static String getTimeRemaining(@NotNull Date start, @NotNull Date end) {
+        long diff = end.getTime() - start.getTime();
+        long seconds = (diff / 1000) % 60;
+        long minutes = (diff / (1000 * 60)) % 60;
+        long hours = (diff / (1000 * 60 * 60)) % 24;
+        long days = (diff / (1000 * 60 * 60 * 24)) % 365;
+        long years = (diff / (1000L * 60 * 60 * 24 * 365));
+        // MONTHS IS NOT CALCULATED BECAUSE LEAP YEARS CAN INTERFERE
+
+        String[] remainFormat = String.format("%02dy %02dd %02dh %02dm %02ds", years, days, hours, minutes, seconds).split("\\s+");
+        return Arrays.stream(remainFormat).filter(current -> !current.contains("00") && !current.equals("00s")).collect(Collectors.joining(" "));
+    }
+
+    /**
+     * A method used to return the amount of time remaining until a specified date. if any of the values
+     * listed in the format below return 0, this method will remove it from the returned string
+     * <br><br/>
+     * <strong>String Format: year(s) day(s) hour(s) minute(s) second(s).</strong>
+     *
+     * @param start Starting date
+     * @param end   Target date
+     * @return Time until target date.
+     */
+    public static String getTimeRemaining(@NotNull Date start, @NotNull String end) {
+        return getTimeRemaining(start, parseDate(end));
+    }
+
+    /**
+     * A method used to return the amount of time remaining until a specified date. if any of the values
+     * listed in the format below return 0, this method will remove it from the returned string
+     * <br><br/>
+     * <strong>String Format: year(s) day(s) hour(s) minute(s) second(s).</strong>
+     *
+     * @param start Starting date
+     * @param end   Target date
+     * @return Time until target date.
+     */
+    public static String getTimeRemaining(@NotNull String start, @NotNull Date end) {
+        return getTimeRemaining(parseDate(start), end);
+    }
+
+    /**
+     * A method used to return the amount of time remaining until a specified date. if any of the values
+     * listed in the format below return 0, this method will remove it from the returned string
+     * <br><br/>
+     * <strong>String Format: year(s) day(s) hour(s) minute(s) second(s).</strong>
+     *
+     * @param start Starting date
+     * @param end   Target date
+     * @return Time until target date.
+     */
+    public static String getTimeRemaining(@NotNull String start, @NotNull String end) {
+        return getTimeRemaining(parseDate(start), end);
+    }
+
+    /**
+     * A method used to return the amount of time remaining until a specified date. if any of the values
+     * listed in the format below return 0, this method will remove it from the returned string
+     * <br><br/>
+     * <strong>String Format: year(s) day(s) hour(s) minute(s) second(s).</strong>
+     *
+     * @param end Target date
+     * @return Time until target date.
+     */
+    public static String getTimeRemaining(@NotNull String end) {
+        return getTimeRemaining(getToday(), end);
+    }
+
+    /**
+     * A method used to return the amount of time remaining until a specified date. if any of the values
+     * listed in the format below return 0, this method will remove it from the returned string
+     * <br><br/>
+     * <strong>String Format: year(s) day(s) hour(s) minute(s) second(s).</strong>
+     *
+     * @param end Target date
+     * @return Time until target date.
+     */
+    public static String getTimeRemaining(@NotNull Date end) {
+        return getTimeRemaining(getToday(), end);
     }
 
     /*
