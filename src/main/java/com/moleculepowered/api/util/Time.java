@@ -1,6 +1,5 @@
-package com.moleculepowered.api;
+package com.moleculepowered.api.util;
 
-import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DateFormat;
@@ -415,8 +414,64 @@ public final class Time {
      */
 
     /**
-     * Mainly designed for repeating tasks, this method takes an input and converts it into a usable
-     * value, used by schedulers and similar.
+     * <p>Mainly designed for repeating tasks, this method takes an input and converts it into a usable
+     * value, used by schedulers and similar.</p>
+     *
+     * <p>Please take a look at the table below for examples of valid inputs.</p>
+     * <table>
+     *     <col width="30%"/>
+     *     <col width="10%"/>
+     *     <col width="60%"/>
+     *     <thead>
+     *     <tr>
+     *         <th>Unit</th>
+     *         <th></th>
+     *         <th>Abbreviation</th>
+     *     </tr>
+     *     <thead>
+     *     <tbody>
+     *      <tr>
+     *          <td>Millisecond</td>
+     *          <td></td>
+     *          <td>[ms, milli, millisecond, milliseconds]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Second</td>
+     *          <td></td>
+     *          <td>[s, sec, second, seconds]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Minute</td>
+     *          <td></td>
+     *          <td>[m, min, minute, minutes]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Hour</td>
+     *          <td></td>
+     *          <td>[h, hr, hour, hours]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Day</td>
+     *          <td></td>
+     *          <td>[d, day, days]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Week</td>
+     *          <td></td>
+     *          <td>[wk, week, weeks]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Month</td>
+     *          <td></td>
+     *          <td>[mo, month, months]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Year</td>
+     *          <td></td>
+     *          <td>[y, year, years]</td>
+     *      </tr>
+     *   </tbody>
+     * </table>
      *
      * @param input Provided input
      * @return A usable interval
@@ -431,38 +486,38 @@ public final class Time {
             case "milli":
             case "millisecond":
             case "milliseconds":
-                return quantity;
+                return quantity / 50;
             case "s":
             case "sec":
             case "second":
             case "seconds":
-                return 1000L * quantity;
+                return (1000L * quantity) / 50;
             case "m":
             case "min":
             case "minute":
             case "minutes":
-                return 60000L * quantity;
+                return (60000L * quantity) / 50;
             case "h":
             case "hr":
             case "hour":
             case "hours":
-                return 3600000L * quantity;
+                return (3600000L * quantity) / 50;
             case "d":
             case "day":
             case "days":
-                return 86400000L * quantity;
+                return (86400000L * quantity) / 50;
             case "wk":
             case "week":
             case "weeks":
-                return 604800000L * quantity;
+                return (604800000L * quantity) / 50;
             case "mo":
             case "month":
             case "months":
-                return 2629800000L * quantity;
+                return (2629800000L * quantity) / 50;
             case "y":
             case "year":
             case "years":
-                return 31557600000L * quantity;
+                return (31557600000L * quantity) / 50;
             default:
                 throw new IllegalArgumentException("Invalid interval format provided: " + input);
         }
@@ -480,9 +535,7 @@ public final class Time {
      * @return Whether the target date is before the compared date.
      * @apiNote If the date is equal to the compared one, this method will always return false.
      */
-    public boolean isBeforeDate(String target, String comparedTo) {
-        Validate.notNull(target, "The target date cannot be null!");
-        Validate.notNull(comparedTo, "The compared to date cannot be null!");
+    public boolean isBeforeDate(@NotNull String target, @NotNull String comparedTo) {
         return parseDate(target).before(parseDate(comparedTo));
     }
 
@@ -494,9 +547,7 @@ public final class Time {
      * @return Whether the target date is before the compared date.
      * @apiNote If the date is equal to the compared one, this method will always return false.
      */
-    public boolean isBeforeDate(String target, Date comparedTo) {
-        Validate.notNull(target, "The target date cannot be null!");
-        Validate.notNull(comparedTo, "The compared to date cannot be null!");
+    public boolean isBeforeDate(@NotNull String target, @NotNull Date comparedTo) {
         return parseDate(target).before(comparedTo);
     }
 
@@ -509,8 +560,6 @@ public final class Time {
      * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isBeforeDate(@NotNull Date target, @NotNull String comparedTo) {
-        Validate.notNull(target, "The target date cannot be null!");
-        Validate.notNull(comparedTo, "The compared to date cannot be null!");
         return target.before(parseDate(comparedTo));
     }
 
@@ -523,8 +572,6 @@ public final class Time {
      * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isBeforeDate(@NotNull Date target, @NotNull Date comparedTo) {
-        Validate.notNull(target, "The target date cannot be null!");
-        Validate.notNull(comparedTo, "The compared to date cannot be null!");
         return target.before(comparedTo);
     }
 
@@ -537,8 +584,6 @@ public final class Time {
      * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isAfterDate(@NotNull String target, @NotNull String comparedTo) {
-        Validate.notNull(target, "The target date cannot be null!");
-        Validate.notNull(comparedTo, "The compared to date cannot be null!");
         return parseDate(target).after(parseDate(comparedTo));
     }
 
@@ -551,8 +596,6 @@ public final class Time {
      * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isAfterDate(@NotNull Date target, @NotNull Date comparedTo) {
-        Validate.notNull(target, "The target date cannot be null!");
-        Validate.notNull(comparedTo, "The compared to date cannot be null!");
         return target.after(comparedTo);
     }
 
@@ -565,8 +608,6 @@ public final class Time {
      * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isAfterDate(@NotNull String target, @NotNull Date comparedTo) {
-        Validate.notNull(target, "The target date cannot be null!");
-        Validate.notNull(comparedTo, "The compared to date cannot be null!");
         return parseDate(target).after(comparedTo);
     }
 
@@ -579,8 +620,6 @@ public final class Time {
      * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isAfterDate(@NotNull Date target, @NotNull String comparedTo) {
-        Validate.notNull(target, "The target date cannot be null!");
-        Validate.notNull(comparedTo, "The compared to date cannot be null!");
         return target.after(parseDate(comparedTo));
     }
 
