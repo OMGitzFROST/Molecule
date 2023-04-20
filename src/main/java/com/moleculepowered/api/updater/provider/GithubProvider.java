@@ -39,11 +39,13 @@ public class GithubProvider extends AbstractProvider {
             if (contributorConn.getResponseCode() == HttpURLConnection.HTTP_FORBIDDEN)
                 throw new RateLimitReachedException();
 
-            final BufferedReader contributorReader = new BufferedReader(new InputStreamReader(contributorConn.getInputStream()));
-            // SET CONTRIBUTORS
-            JsonArray contributors = new Gson().fromJson(contributorReader, JsonArray.class);
-            for (JsonElement contributor : contributors) {
-                this.contributors.add(contributor.getAsJsonObject().get("login").getAsString());
+            if (contributorConn.getResponseCode() != HttpURLConnection.HTTP_NOT_FOUND) {
+                final BufferedReader contributorReader = new BufferedReader(new InputStreamReader(contributorConn.getInputStream()));
+                // SET CONTRIBUTORS
+                JsonArray contributors = new Gson().fromJson(contributorReader, JsonArray.class);
+                for (JsonElement contributor : contributors) {
+                    this.contributors.add(contributor.getAsJsonObject().get("login").getAsString());
+                }
             }
 
             // DISCONNECT FROM CONTRIBUTOR CONNECTION
