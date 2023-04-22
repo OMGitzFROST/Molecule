@@ -4,17 +4,21 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.moleculepowered.api.exception.ProviderFetchException;
 import com.moleculepowered.api.exception.RateLimitReachedException;
 import com.moleculepowered.api.util.Version;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.moleculepowered.api.util.StringUtil.format;
 
 public class GithubProvider extends AbstractProvider {
 
@@ -64,6 +68,7 @@ public class GithubProvider extends AbstractProvider {
             changelogLink = resource.get("html_url").getAsString();
 
             // ACCESS THE REPOSITORIES ASSETS AND SET THE DOWNLOAD URL IF ONE EXISTS
+
             if (assets.size() > 0) {
                 JsonObject latestResource = assets.get(0).getAsJsonObject();
                 downloadLink = latestResource.get("browser_download_url").getAsString();
@@ -72,10 +77,12 @@ public class GithubProvider extends AbstractProvider {
 
             // DISCONNECT FROM RELEASE
             releaseConn.disconnect();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (FileNotFoundException ex) {
+            throw new IllegalArgumentException(format("Invalid repository path: {0}", REPO), ex);
         } catch (RateLimitReachedException ignored) {
             // IGNORED SO OTHER PROVIDERS CAN TAKE OVER
+        } catch (IOException ex) {
+            throw new ProviderFetchException("The provider failed to fetch the latest update", ex);
         }
     }
 

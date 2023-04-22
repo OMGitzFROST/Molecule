@@ -3,6 +3,7 @@ package com.moleculepowered.api.updater.provider;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.moleculepowered.api.exception.ProviderFetchException;
 import com.moleculepowered.api.util.StringUtil;
 import com.moleculepowered.api.util.Version;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +74,7 @@ public class SpigetProvider extends AbstractProvider {
             latestVersion = response2.get("name").getAsString();
             conn2.disconnect();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ProviderFetchException("The provider failed to fetch the latest update", ex);
         }
     }
 

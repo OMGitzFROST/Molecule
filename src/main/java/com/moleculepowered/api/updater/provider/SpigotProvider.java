@@ -1,5 +1,6 @@
 package com.moleculepowered.api.updater.provider;
 
+import com.moleculepowered.api.exception.ProviderFetchException;
 import com.moleculepowered.api.util.Version;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +42,7 @@ public class SpigotProvider extends AbstractProvider {
             // CLOSE CONNECTION
             conn.disconnect();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ProviderFetchException("The provider failed to fetch the latest update", ex);
         }
     }
 

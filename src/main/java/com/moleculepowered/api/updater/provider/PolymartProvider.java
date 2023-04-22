@@ -2,6 +2,7 @@ package com.moleculepowered.api.updater.provider;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.moleculepowered.api.exception.ProviderFetchException;
 import com.moleculepowered.api.util.Version;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,8 +17,8 @@ import java.util.Set;
 public class PolymartProvider extends AbstractProvider {
 
     private final Set<String> contributors = new HashSet<>();
-    private final int resourceID;
     private String downloadLink, latestVersion, changelogLink;
+    private final int resourceID;
     private String price;
     private int totalDownloads;
 
@@ -37,7 +38,7 @@ public class PolymartProvider extends AbstractProvider {
     @Override
     public void fetch() {
         try {
-            HttpURLConnection conn = connection("https://api.polymart.org/v1/getResourceInfo/?pretty_print_result=1&resource_id={0}", resourceID);
+            HttpURLConnection conn = connection("https://api.polymart.org/v1/getResourceInfo/resource_id={0}", resourceID);
 
             // CREATE A READER FOR JSON PARSING
             final BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -65,7 +66,7 @@ public class PolymartProvider extends AbstractProvider {
             // DISCONNECT
             conn.disconnect();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new ProviderFetchException("The provider failed to fetch the latest update", ex);
         }
     }
 
