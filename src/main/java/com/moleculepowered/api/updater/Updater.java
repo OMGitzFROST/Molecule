@@ -2,6 +2,7 @@ package com.moleculepowered.api.updater;
 
 import com.moleculepowered.api.event.updater.UpdateCompleteEvent;
 import com.moleculepowered.api.updater.provider.AbstractProvider;
+import com.moleculepowered.api.util.FileUtil;
 import com.moleculepowered.api.util.Time;
 import com.moleculepowered.api.util.Version;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +17,12 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,12 +33,24 @@ import java.util.stream.Collectors;
 
 import static com.moleculepowered.api.util.StringUtil.format;
 
+/**
+ * <p>This class handles our Updater Molecule, its consists of chain methods developer's can use
+ * to customize it to their liking.</p>
+ *
+ * <p>We build this component on a "provider" framework which, in other words, means that
+ * its primary function is based on providers that access the different platforms for version
+ * checking, such as Bukkit, Spigot, Github, etc.</p>
+ *
+ * @author OMGitzFROST
+ * @since 1.0.0
+ */
 public final class Updater {
 
     private final List<AbstractProvider> providers = new ArrayList<>();
     private final Plugin plugin;
     private AbstractProvider activeProvider;
     private boolean enabled, betaEnabled;
+    private final File dataFolder;
     private String permission;
     private long interval;
     private Listener listener;
@@ -41,11 +60,19 @@ public final class Updater {
     CONSTRUCTOR
      */
 
+    /**
+     * This constructor serves as the start of the Updater chain, its takes a plugin as its
+     * parameter that will be used to identify its current version, and provide the logging methods
+     * needed throughout this class.
+     *
+     * @param plugin Provided plugin
+     */
     public Updater(@NotNull Plugin plugin) {
         this.plugin = plugin;
         interval = 10800000L;
         enabled = true;
         permission = "";
+        dataFolder = new File(plugin.getDataFolder().getParentFile(), "Updater");
     }
 
     /*
@@ -71,7 +98,9 @@ public final class Updater {
             return;
         }
 
-        plugin.getServer().getScheduler().runTaskTimer(plugin, () -> initialize(false), 0, interval);
+        // INITIALIZE TASK TIMER
+        plugin.getServer().getPluginManager().registerEvents(listener != null ? listener : new UpdateEventHandler(), plugin);
+        plugin.getServer().getScheduler().runTaskTimer(plugin, () -> initialize(), 0, interval);
     }
 
     /**
@@ -93,41 +122,109 @@ public final class Updater {
             return;
         }
 
+        plugin.getServer().getPluginManager().registerEvents(listener != null ? listener : new UpdateEventHandler(), plugin);
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> initialize(true), 0, interval);
     }
 
     /**
-     * A private utility method that is used to centralize version checking
+     * A utility method that is used to centralize our version checking, this method allows you to define
+     * if this updater should run as async, this definition will be used by the {@link UpdateCompleteEvent} when
+     * it finishes fetching the latest versions.
      *
      * @param async whether this method will run async
      * @see #schedule()
      * @see #scheduleAsync()
+     * @see #initialize()
      */
     private void initialize(boolean async) {
+        notifyAudience("&6Checking for a new update...");
+
         Version currentVersion = new Version(plugin.getDescription().getVersion());
 
+        // ITERATE THROUGH EACH PROVIDER AND ATTEMPT TO FIND ONE WITH THE LATEST UPDATE
         for (AbstractProvider provider : providers) {
             provider.fetch();
             Version fetchedVersion = provider.getLatestVersion();
 
+            // ADD AS ACTIVE PROVIDER IF ONE HAS NOT BEEN SET ALREADY
             if (activeProvider == null) activeProvider = provider;
+
+            // SET AS LATEST IF THE FETCHED UPDATE IS NOT GREATER
             if (!fetchedVersion.isGreaterThan(currentVersion)) {
                 result = UpdateResult.LATEST;
                 continue;
             }
+
+            // A GREATER VERSION IS FOUND, ENSURE IT CAN BE USED AS THE LATEST DOWNLOAD
             if (fetchedVersion.isGreaterThan(currentVersion)) {
                 if (!fetchedVersion.isUnstable() || (fetchedVersion.isUnstable() && betaEnabled)) {
                     if (!fetchedVersion.isEqual(activeProvider.getLatestVersion())) activeProvider = provider;
                     result = UpdateResult.UPDATE_AVAILABLE;
+
+                    // DOWNLOAD UPDATE (IF POSSIBLE)
+                    try {
+                        if (provider.getDownloadLink() != null) {
+                            File outputFile = new File(dataFolder, FileUtil.getFileName(provider.getDownloadLink()));
+                            attemptDownload(provider.getDownloadLink(), outputFile);
+                        }
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
             }
         }
 
-        // CREATE USABLE VERSIONS
+        // CALL THE UPDATE COMPLETE EVENT ONCE ALL PROVIDERS WERE ITERATED
         UpdateCompleteEvent completeEvent = new UpdateCompleteEvent(async, this);
-        plugin.getServer().getPluginManager().registerEvents(listener != null ? listener : new UpdateEventHandler(), plugin);
-
         if (!completeEvent.isCancelled()) plugin.getServer().getPluginManager().callEvent(completeEvent);
+    }
+
+    /**
+     * <p>A utility method that is used to centralize our version checking.</p>
+     *
+     * <p>Please note that by default this method is configured to run its tasks on the main thread,
+     * if async threading is required please consider using {@link #initialize(boolean)} and define
+     * the boolean value as true.</p>
+     *
+     * @see #schedule()
+     * @see #scheduleAsync()
+     * @see #initialize(boolean)
+     */
+    public void initialize() {
+        initialize(false);
+    }
+
+    /**
+     * A private utility method used to download the latest version using a provider's download link
+     * if a download is not available, this method will do nothing
+     *
+     * @param location   Download link
+     * @param outputFile Location for the downloaded file
+     * @throws IOException when an issue occurred while downloading a file
+     */
+    private void attemptDownload(@Nullable String location, @NotNull File outputFile) throws IOException {
+        if (location == null) return;
+        if (!dataFolder.exists() && !dataFolder.mkdirs())
+            throw new FileNotFoundException("Failed to create our updater's datafolder");
+
+        HttpURLConnection downloadLink = (HttpURLConnection) new URL(location).openConnection();
+        if (downloadLink.getResponseCode() == HttpURLConnection.HTTP_OK && !outputFile.exists()) {
+            notifyAudience("Downloading...");
+            Files.copy(downloadLink.getInputStream(), outputFile.toPath());
+        }
+    }
+
+    /**
+     * A private method used to send a notification to all audience members and the console
+     *
+     * @param message Provided message
+     * @param param   Optional parameters
+     */
+    private void notifyAudience(String message, Object... param) {
+        plugin.getLogger().info(format(true, message, param));
+        getAudience().forEach(player -> player.sendMessage(format(message, param)));
+
+        System.out.println("test1");
     }
 
     /*
@@ -423,7 +520,7 @@ public final class Updater {
             // SEND CONSOLE NOTIFICATIONS WHEN THE UPDATER COMPLETES
             switch (event.getResult()) {
                 case LATEST:
-                    plugin.getLogger().info("You have the latest version of this plugin");
+                    plugin.getLogger().info("No updates were found...");
                     break;
                 case UPDATE_AVAILABLE:
                     plugin.getLogger().info(StringUtils.repeat('*', 60));
@@ -443,7 +540,6 @@ public final class Updater {
                     plugin.getLogger().warning("The updater returned an unknown result, its severity is also undefined");
             }
 
-            // SEND PLAYER NOTIFICATION
             getAudience().forEach(this::sendPlayerNotification);
         }
 
@@ -466,14 +562,15 @@ public final class Updater {
          * @param player Target player
          */
         private void sendPlayerNotification(@NotNull Player player) {
+
             // SEND PLAYER NOTIFICATIONS WHEN THE UPDATER COMPLETES
             switch (result) {
                 case LATEST:
                     player.sendMessage("You have the latest version of this plugin");
                     break;
                 case UPDATE_AVAILABLE:
-                    player.sendMessage(format("Version ({0}) is now available for {1}.", provider.getLatestVersion().getVersion(), plugin.getName()));
-                    player.sendMessage("Please refer to the console for more information.");
+                    player.sendMessage(format("&3Version (&f{0}&3) is now available for &6{1}&3.", provider.getLatestVersion().getVersion(), plugin.getName()));
+                    player.sendMessage(format("&3Please refer to the console for more information."));
                     break;
                 case DISABLED:
                     player.sendMessage("The auto updater for this plugin is disabled, please enable to receive update notifications");
