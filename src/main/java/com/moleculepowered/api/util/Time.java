@@ -12,6 +12,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * A utility class that provides a variety of methods related to Time, Dates, etc.
+ *
+ * @author OMGitzFROST
+ * @since 1.0.0
+ */
 public final class Time {
 
     private static final String DEFAULT_DATE_FORMAT = "MM/dd/yyy";
@@ -37,7 +43,7 @@ public final class Time {
      *         <th></th>
      *         <th>Abbreviation</th>
      *     </tr>
-     *     <thead>
+     *     </thead>
      *     <tbody>
      *      <tr>
      *          <td>Millisecond</td>
@@ -533,7 +539,6 @@ public final class Time {
      * @param target     The date being tested.
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is before the compared date.
-     * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isBeforeDate(@NotNull String target, @NotNull String comparedTo) {
         return parseDate(target).before(parseDate(comparedTo));
@@ -545,7 +550,6 @@ public final class Time {
      * @param target     The date being tested.
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is before the compared date.
-     * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isBeforeDate(@NotNull String target, @NotNull Date comparedTo) {
         return parseDate(target).before(comparedTo);
@@ -557,7 +561,6 @@ public final class Time {
      * @param target     The date being tested.
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is before the compared date.
-     * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isBeforeDate(@NotNull Date target, @NotNull String comparedTo) {
         return target.before(parseDate(comparedTo));
@@ -569,7 +572,6 @@ public final class Time {
      * @param target     The date being tested.
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is before the compared date.
-     * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isBeforeDate(@NotNull Date target, @NotNull Date comparedTo) {
         return target.before(comparedTo);
@@ -581,7 +583,6 @@ public final class Time {
      * @param target     The date being tested.
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is after the compared date.
-     * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isAfterDate(@NotNull String target, @NotNull String comparedTo) {
         return parseDate(target).after(parseDate(comparedTo));
@@ -593,7 +594,6 @@ public final class Time {
      * @param target     The date being tested.
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is after the compared date.
-     * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isAfterDate(@NotNull Date target, @NotNull Date comparedTo) {
         return target.after(comparedTo);
@@ -605,7 +605,6 @@ public final class Time {
      * @param target     The date being tested.
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is after the compared date.
-     * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isAfterDate(@NotNull String target, @NotNull Date comparedTo) {
         return parseDate(target).after(comparedTo);
@@ -617,7 +616,6 @@ public final class Time {
      * @param target     The date being tested.
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is after the compared date.
-     * @apiNote If the date is equal to the compared one, this method will always return false.
      */
     public boolean isAfterDate(@NotNull Date target, @NotNull String comparedTo) {
         return target.after(parseDate(comparedTo));
