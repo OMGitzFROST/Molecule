@@ -7,6 +7,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * <p>The purpose of this class is to create functional version numbers; it will separate
+ * each part of its number, such as Major, Minor and make them accessible with easy to use methods.</p>
+ *
+ * <p>Additionally, this class provides methods that allow you to compare version numbers and check if
+ * one is less than, greater than, or equal to its target.</p>
+ *
+ * @author OMGitzFROST
+ * @since 1.0.0
+ */
 public final class Version {
     private final String VERSION_PATTERN, MODIFIER_PATTERN;
     private String version, modifier;
@@ -21,8 +31,8 @@ public final class Version {
      * that and will return N/A as its value</p>
      *
      * @param input Provided input
-     * @see #Version(Integer)
-     * @see #Version(Double)
+     * @see #Version(int)
+     * @see #Version(double)
      */
     public Version(@Nullable String input) {
         VERSION_PATTERN = "(?:(\\d+)\\.)?(?:(\\d+)\\.)?(\\*|\\d+)";
@@ -51,11 +61,11 @@ public final class Version {
      * that and will return N/A as its value</p>
      *
      * @param input Provided input
-     * @see #Version(Double)
+     * @see #Version(double)
      * @see #Version(String)
      */
-    public Version(@NotNull Integer input) {
-        this(input.toString());
+    public Version(int input) {
+        this(String.valueOf(input));
     }
 
     /**
@@ -67,11 +77,11 @@ public final class Version {
      * that and will return N/A as its value</p>
      *
      * @param input Provided input
-     * @see #Version(Integer)
+     * @see #Version(int)
      * @see #Version(String)
      */
-    public Version(@NotNull Double input) {
-        this(input.toString());
+    public Version(double input) {
+        this(String.valueOf(input));
     }
 
     /*
@@ -104,7 +114,7 @@ public final class Version {
      *
      * @return Major release
      */
-    public Integer getMajor() {
+    public int getMajor() {
         return versionParts.length >= 1 ? Integer.parseInt(versionParts[0]) : 0;
     }
 
@@ -113,7 +123,7 @@ public final class Version {
      *
      * @return Minor release
      */
-    public Integer getMinor() {
+    public int getMinor() {
         return versionParts.length >= 2 ? Integer.parseInt(versionParts[1]) : 0;
     }
 
@@ -122,7 +132,7 @@ public final class Version {
      *
      * @return Patch release
      */
-    public Integer getPatch() {
+    public int getPatch() {
         return versionParts.length >= 3 ? Integer.parseInt(versionParts[2]) : 0;
     }
 
