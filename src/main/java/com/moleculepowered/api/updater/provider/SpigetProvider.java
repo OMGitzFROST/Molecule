@@ -114,7 +114,7 @@ public class SpigetProvider extends AbstractProvider {
      * @return Latest version number
      */
     @Override
-    public @NotNull Version getLatestVersion() {
+    public @NotNull Version getRelease() {
         return new Version(latestVersion);
     }
 

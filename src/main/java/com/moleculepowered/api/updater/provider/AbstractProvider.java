@@ -82,7 +82,7 @@ public abstract class AbstractProvider {
      *
      * @return Latest version number
      */
-    public abstract @NotNull Version getLatestVersion();
+    public abstract @NotNull Version getRelease();
 
     /**
      * Return's the price of the latest update
