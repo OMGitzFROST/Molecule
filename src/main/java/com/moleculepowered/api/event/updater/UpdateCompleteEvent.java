@@ -57,7 +57,7 @@ public class UpdateCompleteEvent extends AbstractEvent implements Cancellable {
      * @return The latest version
      */
     public @NotNull Version getVersion() {
-        return provider.getLatestVersion();
+        return provider.getRelease();
     }
 
     /**
