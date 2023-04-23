@@ -1,5 +1,7 @@
 package com.moleculepowered.api.updater;
 
+import com.moleculepowered.api.Console;
+import com.moleculepowered.api.MoleculeAPI;
 import com.moleculepowered.api.event.updater.UpdateCompleteEvent;
 import com.moleculepowered.api.updater.provider.AbstractProvider;
 import com.moleculepowered.api.util.FileUtil;
@@ -47,14 +49,14 @@ import static com.moleculepowered.api.util.StringUtil.format;
 public final class Updater {
 
     private final List<AbstractProvider> providers = new ArrayList<>();
-    private final Plugin plugin;
-    private AbstractProvider activeProvider;
-    private boolean enabled, betaEnabled;
     private final File dataFolder;
-    private String permission;
-    private long interval;
-    private Listener listener;
     private UpdateResult result = UpdateResult.UNKNOWN;
+    private AbstractProvider activeProvider;
+    private String permission;
+    private final Plugin plugin;
+    private Listener listener;
+    private boolean enabled, betaEnabled;
+    private long interval;
 
     /*
     CONSTRUCTOR
@@ -68,8 +70,9 @@ public final class Updater {
      * @param plugin Provided plugin
      */
     public Updater(@NotNull Plugin plugin) {
+        MoleculeAPI.setPlugin(plugin);
         this.plugin = plugin;
-        interval = 10800000L;
+        interval = Time.parseInterval("3h");
         enabled = true;
         permission = "";
         dataFolder = new File(plugin.getDataFolder().getParentFile(), "Updater");
@@ -93,7 +96,7 @@ public final class Updater {
 
         // FIRST, VERIFY THAT ALL REQUIREMENTS ARE MET BEFORE SCHEDULING
         if (!enabled) {
-            plugin.getLogger().info("Updater disabled, there we will not check for updates.");
+            Console.info("Updater disabled, there we will not check for updates.");
             result = UpdateResult.DISABLED;
             return;
         }
@@ -117,7 +120,7 @@ public final class Updater {
 
         // FIRST, VERIFY THAT ALL REQUIREMENTS ARE MET BEFORE SCHEDULING
         if (!enabled) {
-            plugin.getLogger().info("Updater disabled, there we will not check for updates.");
+            Console.info("Updater disabled, there we will not check for updates.");
             result = UpdateResult.DISABLED;
             return;
         }
@@ -144,7 +147,7 @@ public final class Updater {
         // ITERATE THROUGH EACH PROVIDER AND ATTEMPT TO FIND ONE WITH THE LATEST UPDATE
         for (AbstractProvider provider : providers) {
             provider.fetch();
-            Version fetchedVersion = provider.getLatestVersion();
+            Version fetchedVersion = provider.getRelease();
 
             // ADD AS ACTIVE PROVIDER IF ONE HAS NOT BEEN SET ALREADY
             if (activeProvider == null) activeProvider = provider;
@@ -158,7 +161,7 @@ public final class Updater {
             // A GREATER VERSION IS FOUND, ENSURE IT CAN BE USED AS THE LATEST DOWNLOAD
             if (fetchedVersion.isGreaterThan(currentVersion)) {
                 if (!fetchedVersion.isUnstable() || (fetchedVersion.isUnstable() && betaEnabled)) {
-                    if (!fetchedVersion.isEqual(activeProvider.getLatestVersion())) activeProvider = provider;
+                    if (!fetchedVersion.isEqual(activeProvider.getRelease())) activeProvider = provider;
                     result = UpdateResult.UPDATE_AVAILABLE;
 
                     // DOWNLOAD UPDATE (IF POSSIBLE)
@@ -204,6 +207,10 @@ public final class Updater {
      */
     private void attemptDownload(@Nullable String location, @NotNull File outputFile) throws IOException {
         if (location == null) return;
+        if (outputFile.exists()) {
+            result = UpdateResult.EXISTS;
+            return;
+        }
         if (!dataFolder.exists() && !dataFolder.mkdirs())
             throw new FileNotFoundException("Failed to create our updater's datafolder");
 
@@ -211,6 +218,7 @@ public final class Updater {
         if (downloadLink.getResponseCode() == HttpURLConnection.HTTP_OK && !outputFile.exists()) {
             notifyAudience("Downloading...");
             Files.copy(downloadLink.getInputStream(), outputFile.toPath());
+            if (outputFile.exists()) result = UpdateResult.EXISTS;
         }
     }
 
@@ -221,10 +229,8 @@ public final class Updater {
      * @param param   Optional parameters
      */
     private void notifyAudience(String message, Object... param) {
-        plugin.getLogger().info(format(true, message, param));
+        Console.info(message, param);
         getAudience().forEach(player -> player.sendMessage(format(message, param)));
-
-        System.out.println("test1");
     }
 
     /*
@@ -516,28 +522,29 @@ public final class Updater {
         public void onUpdateComplete(@NotNull UpdateCompleteEvent event) {
 
             provider = event.getProvider();
+            String latestVersion = provider.getRelease().getVersion();
 
             // SEND CONSOLE NOTIFICATIONS WHEN THE UPDATER COMPLETES
             switch (event.getResult()) {
                 case LATEST:
-                    plugin.getLogger().info("No updates were found...");
+                    Console.info("No updates were found...");
+                    break;
+                case EXISTS:
+                    Console.info("&aThe latest version of &e{0} &ais already downloaded, Check your Update folder", plugin.getName());
                     break;
                 case UPDATE_AVAILABLE:
-                    plugin.getLogger().info(StringUtils.repeat('*', 60));
-                    plugin.getLogger().info(format("Version ({0}) is now available for {1}.", provider.getLatestVersion().getVersion(), plugin.getName()));
-                    if (provider.getDownloadLink() != null)
-                        plugin.getLogger().info(format("Download: {0}", provider.getDownloadLink()));
-                    if (provider.getChangelogLink() != null)
-                        plugin.getLogger().info(format("Changelog: {0}", provider.getChangelogLink()));
-                    if (provider.getDonationLink() != null)
-                        plugin.getLogger().info(format("Donate: {0}", provider.getDonationLink()));
-                    plugin.getLogger().info(StringUtils.repeat('*', 60));
+                    Console.info(StringUtils.repeat('*', 60));
+                    Console.info("Version ({0}) is now available for {1}.", latestVersion, plugin.getName());
+                    Console.info(provider.getDownloadLink() != null, "Download: {0}", provider.getDownloadLink());
+                    Console.info(provider.getChangelogLink() != null, "Changelog: {0}", provider.getChangelogLink());
+                    Console.info(provider.getDonationLink() != null, "Donate: {0}", provider.getDonationLink());
+                    Console.info(StringUtils.repeat('*', 60));
                     break;
                 case DISABLED:
-                    plugin.getLogger().warning("The auto updater for this plugin is disabled, please enable to receive update notifications");
+                    Console.warning("The auto updater for this plugin is disabled, please enable to receive update notifications");
                     break;
                 default:
-                    plugin.getLogger().warning("The updater returned an unknown result, its severity is also undefined");
+                    Console.warning("The updater returned an unknown result, its severity is also undefined");
             }
 
             getAudience().forEach(this::sendPlayerNotification);
@@ -569,7 +576,7 @@ public final class Updater {
                     player.sendMessage("You have the latest version of this plugin");
                     break;
                 case UPDATE_AVAILABLE:
-                    player.sendMessage(format("&3Version (&f{0}&3) is now available for &6{1}&3.", provider.getLatestVersion().getVersion(), plugin.getName()));
+                    player.sendMessage(format("&3Version (&f{0}&3) is now available for &6{1}&3.", provider.getRelease().getVersion(), plugin.getName()));
                     player.sendMessage(format("&3Please refer to the console for more information."));
                     break;
                 case DISABLED:
