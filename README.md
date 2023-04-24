@@ -24,13 +24,13 @@ Please take a look at our [Documentation](https://docs.moleculepowered.com) for 
 ## Installation
 
 Adding our API to your project is simple, simply find your desired build tool from
-the options below and copy it into their designated file, and voilà! it's that simple,
-take a look at the supported build tools below.
+the options below and copy it into their designated file, and voilà!
+It's that simple, take a look at the supported build tools below.
 
 ### Maven
 
 ````xml
-// ADD REPOSITORY
+<!--ADD REPOSITORY-->
 <repositories>
     <repository>
         <id>jitpack.io</id>
@@ -38,7 +38,7 @@ take a look at the supported build tools below.
     </repository>
 </repositories>
 
-// ADD DEPENDENCY
+        <!--ADD DEPENDENCY-->
 <dependencies>
     <dependency>
         <groupId>com.github.OMGitzFROST</groupId>
@@ -50,7 +50,7 @@ take a look at the supported build tools below.
 
 ### Gradle
 
-````java
+````
 repositories {
     maven { url 'https://jitpack.io' }
 }
@@ -63,7 +63,8 @@ dependencies {
 ## Additional Resources
 
 Didn't find what your looking for? Please take a look at these additional resources
+
 * [Issue tracker](https://github.com/OMGitzFROST/MoleculeAPI/issues) — Track, Create, View existing issues
-* [Feature request]() — Have a good idea? Lets hear it!
+* [Feature request]() — Have a good idea? Let's hear it!
 * [Discord Support](https://discord.gg/38JRNJxAVD) — Personalized support
 * [Documentation](https://docs.moleculepowered.com) - Learn how to use our API
