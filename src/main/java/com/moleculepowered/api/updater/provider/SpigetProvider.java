@@ -54,7 +54,9 @@ public class SpigetProvider extends AbstractProvider {
 
             // SET VALUES
             downloadLink = format("https://www.spigotmc.org/{0}", file.get("url").getAsString());
-            changelogLink = format("https://www.spigotmc.org/resources/{0}/update?update={1}", resourceID, updates.get(0).getAsJsonObject().get("id").getAsString());
+            if (updates.size() > 0)
+                changelogLink = format("https://www.spigotmc.org/resources/{0}/update?update={1}", resourceID, updates.get(0).getAsJsonObject().get("id").getAsString());
+
             price = format("{0} {1}", response.get("price").getAsString(), StringUtil.nonNull(response.get("currency")));
             totalDownloads = response.get("downloads").getAsInt();
             premium = response.get("premium").getAsBoolean();
