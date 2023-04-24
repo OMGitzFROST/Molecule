@@ -41,9 +41,9 @@ It's that simple, take a look at the supported build tools below.
 
         <!--ADD DEPENDENCY-->
 <dependency>
-<groupId>com.github.OMGitzFROST</groupId>
-<artifactId>MoleculeAPI</artifactId>
-<version>latest</version>
+    <groupId>com.github.OMGitzFROST</groupId>
+    <artifactId>MoleculeAPI</artifactId>
+    <version>latest</version>
 </dependency>
 ````
 
