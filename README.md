@@ -34,21 +34,17 @@ It's that simple, take a look at the supported build tools below.
 
 ````xml
 <!--ADD REPOSITORY-->
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
+<repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+</repository>
 
         <!--ADD DEPENDENCY-->
-<dependencies>
 <dependency>
-    <groupId>com.github.OMGitzFROST</groupId>
-    <artifactId>MoleculeAPI</artifactId>
-    <version>latest</version>
+<groupId>com.github.OMGitzFROST</groupId>
+<artifactId>MoleculeAPI</artifactId>
+<version>latest</version>
 </dependency>
-</dependencies>
 ````
 
 ### Gradle
