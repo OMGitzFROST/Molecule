@@ -2,11 +2,13 @@
 # Molecule API
 
 MoleculeAPI is a spigot resource designed to provide plugin developers with a powerful suite
-of tools that streamline their coding process, providing them with some fundamental components, such as an Updater, a feature packed
+of tools that streamline their coding process, providing them with some fundamental components, such as an Updater, a
+feature packed
 console logger, localization, user management and so much more.
 
-We're constantly working on expanding this project, mainly focused on spigot/paper but will eventually expand to provide support for other 
-frameworks such as Sponge, Velocity, etc. 
+We're constantly working on expanding this project, mainly focused on spigot/paper but will eventually expand to provide
+support for other
+frameworks such as Sponge, Velocity, etc.
 
 ## Features
 
@@ -19,7 +21,8 @@ Currently, this API is under constant development, therefore, we're constantly a
 * Enhanced Configurations
 * User Management System
 
-Please take a look at our [Documentation](https://docs.moleculepowered.com) for detailed tutorials on how to use each of these features. 
+Please take a look at our [Documentation](https://docs.moleculepowered.com) for detailed tutorials on how to use each of
+these features.
 
 ## Installation
 
@@ -40,11 +43,11 @@ It's that simple, take a look at the supported build tools below.
 
         <!--ADD DEPENDENCY-->
 <dependencies>
-    <dependency>
-        <groupId>com.github.OMGitzFROST</groupId>
-        <artifactId>MoleculeAPI</artifactId>
-        <version>latest</version>
-    </dependency>
+<dependency>
+    <groupId>com.github.OMGitzFROST</groupId>
+    <artifactId>MoleculeAPI</artifactId>
+    <version>latest</version>
+</dependency>
 </dependencies>
 ````
 
