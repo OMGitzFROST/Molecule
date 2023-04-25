@@ -457,7 +457,7 @@ public final class Console {
          */
         @Override
         public boolean isLoggable(@NotNull LogRecord record) {
-            return canDebug && record.getMessage().contains(DEBUG_PREFIX);
+            return !record.getMessage().contains(DEBUG_PREFIX) || canDebug;
         }
     }
 }
