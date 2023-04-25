@@ -1,7 +1,7 @@
 [issues]: https://img.shields.io/github/issues/OMGitzFROST/MoleculeAPI
 [checks]: https://img.shields.io/github/checks-status/OMGitzFROST/MoleculeAPI/1.0.2-beta
 [license]: https://img.shields.io/github/license/OMGitzFROST/MoleculeAPI
-[release]: https://img.shields.io/github/v/release/OMGitzFROST/MoleculeAPI?include_prereleases
+[release]: https://img.shields.io/jitpack/version/com.github.OMGitzFROST/MoleculeAPI
 [discord]: https://img.shields.io/discord/1029272340707680318
 
 [contributing]: https://github.com/OMGitzFROST/MoleculeAPI/blob/master/.github/CONTRIBUTING.md
@@ -9,7 +9,7 @@
 
 # Molecule API
 
-![checks] ![issues] ![license] ![discord]
+![checks] ![release] ![issues] ![license] ![discord]
 
 MoleculeAPI is a spigot resource designed to provide plugin developers with a powerful suite
 of tools that streamline their coding process, providing them with some fundamental components, such as an Updater, a
