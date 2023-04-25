@@ -1,11 +1,15 @@
-<h1 style="text-align: center;">Molecule API</h1>
+[issues]: https://github.com/OMGitzFROST/MoleculeAPI/issues
+[passing]: https://img.shields.io/github/checks-status/OMGitzFROST/MoleculeAPI/1.0.2-beta
+[license]: https://img.shields.io/github/license/OMGitzFROST/MoleculeAPI
+[release]: https://img.shields.io/github/v/release/OMGitzFROST/MoleculeAPI?include_prereleases
+[discord]: https://img.shields.io/discord/1029272340707680318
 
-<ul style="text-align: center; list-style: none; margin: 0; padding: 0;">
-<li style="display: inline; margin-left: auto; margin-right: auto; top: 0;"><img alt="GitHub tag checks state" src="https://img.shields.io/github/checks-status/OMGitzFROST/MoleculeAPI/1.0.2-beta"></li>
-<li style="display: inline; margin-left: auto; margin-right: auto; top: 0;"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/OMGitzFROST/MoleculeAPI"></li>
-<li style="display: inline; margin-left: auto; margin-right: auto; top: 0;"><img alt="GitHub" src="https://img.shields.io/github/license/OMGitzFROST/MoleculeAPI"></li>
-<li style="display: inline; margin-left: auto; margin-right: auto; top: 0;"><img alt="Discord" src="https://img.shields.io/discord/1029272340707680318"></li>
-</ul>
+[contributing]: https://github.com/OMGitzFROST/MoleculeAPI/blob/master/.github/CONTRIBUTING.md
+<!-- The stuff above isn't visible in the readme -->
+
+# Molecule API
+
+![Passing][passing] [Release][release] [License][license] [Discord][discord]
 
 MoleculeAPI is a spigot resource designed to provide plugin developers with a powerful suite
 of tools that streamline their coding process, providing them with some fundamental components, such as an Updater, a
