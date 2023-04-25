@@ -3,9 +3,7 @@
 [license]: https://img.shields.io/github/license/OMGitzFROST/MoleculeAPI
 [release]: https://img.shields.io/jitpack/version/com.github.OMGitzFROST/MoleculeAPI
 [discord]: https://img.shields.io/discord/1029272340707680318
-
-[contributing]: https://github.com/OMGitzFROST/MoleculeAPI/blob/master/.github/CONTRIBUTING.md
-<!-- The stuff above isn't visible in the readme -->
+<!-- The stuff above isn't visible in the README -->
 
 # Molecule API
 
