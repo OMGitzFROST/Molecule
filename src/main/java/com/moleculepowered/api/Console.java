@@ -5,7 +5,9 @@ import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.logging.Filter;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,8 +21,16 @@ import java.util.regex.Pattern;
 public final class Console {
 
     private static final Logger LOGGER = Logger.getLogger("MoleculeAPI");
-    private static String prefix;
-    private static boolean prettyPrint = true;
+    private static final String DEBUG_PREFIX = "[DEBUG]";
+    private static String PREFIX;
+    private static boolean prettyPrint = true, canDebug = false;
+
+    /*
+    GLOBALLY SETS THE DEBUG FILTER WITHOUT NEEDING TO BE EXPLICITLY CALLED UPON
+     */
+    static {
+        LOGGER.setFilter(new DebugFilter());
+    }
 
     /**
      * A main constructor used by this class. This constructor does not allow you to
@@ -40,7 +50,44 @@ public final class Console {
      * @see #Console()
      */
     public Console(@Nullable String prefix) {
-        setPrefix(prefix);
+        Console.PREFIX = prefix != null ? ConsoleColor.parse("[" + prefix + "&r] ") : "";
+    }
+
+    /*
+    SPECIALTY LOGGING METHODS
+     */
+
+    /**
+     * <p>Prints a debug message to console. Please note that in-order for you to see
+     * these messages, debug must be enabled for the console, by default debug messages are disabled.</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param message Provided message
+     * @param param   Optional parameters
+     * @see #setDebugToggle(boolean)
+     * @see #debug(boolean, String, Object...)
+     */
+    public static void debug(String message, Object... param) {
+        debug(true, message, param);
+    }
+
+    /**
+     * <p>Prints a debug message to console if a condition is met. Please note that in-order for you to see
+     * these messages, debug must be enabled for the console, by default debug messages are disabled.</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param condition Whether this logger should actually log
+     * @param message Provided message
+     * @param param   Optional parameters
+     * @see #setDebugToggle(boolean)
+     * @see #debug(String, Object...)
+     */
+    public static void debug(boolean condition, String message, Object... param) {
+        log(condition, Level.INFO, DEBUG_PREFIX + " " + message, param);
     }
 
     /**
@@ -51,6 +98,7 @@ public final class Console {
      *
      * @param message Provided message
      * @param param   Optional parameters
+     * @see #info(boolean, String, Object...)
      */
     public static void info(String message, Object... param) {
         info(true, message, param);
@@ -65,14 +113,11 @@ public final class Console {
      * @param condition Whether this logger should actually log
      * @param message   Provided message
      * @param param     Optional parameters
+     * @see #info(String, Object...)
      */
     public static void info(boolean condition, String message, Object... param) {
         log(condition, Level.INFO, message, param);
     }
-
-    /*
-    SPECIALTY LOGGING METHODS
-     */
 
     /**
      * <p>Prints a warning message to console</p>
@@ -82,6 +127,7 @@ public final class Console {
      *
      * @param message Provided message
      * @param param   Optional parameters
+     * @see #warning(boolean, String, Object...)
      */
     public static void warning(String message, Object... param) {
         warning(true, message, param);
@@ -96,6 +142,7 @@ public final class Console {
      * @param condition Whether this logger should actually log
      * @param message   Provided message
      * @param param     Optional parameters
+     * @see #warning(String, Object...)
      */
     public static void warning(boolean condition, String message, Object... param) {
         log(condition, Level.WARNING, ConsoleColor.colorize(ConsoleColor.GOLD, message), param);
@@ -109,6 +156,7 @@ public final class Console {
      *
      * @param message Provided message
      * @param param   Optional parameters
+     * @see #severe(boolean, String, Object...)
      */
     public static void severe(String message, Object... param) {
         severe(true, message, param);
@@ -123,10 +171,15 @@ public final class Console {
      * @param condition Whether this logger should actually log
      * @param message   Provided message
      * @param param     Optional parameters
+     * @see #severe(String, Object...)
      */
     public static void severe(boolean condition, String message, Object... param) {
         log(condition, Level.SEVERE, ConsoleColor.colorize(ConsoleColor.RED, message), param);
     }
+
+    /*
+    DEFAULT LOGGING METHODS
+     */
 
     /**
      * <p>Prints a message to console with a specified level of severity if a condition is met</p>
@@ -138,6 +191,8 @@ public final class Console {
      * @param level     Level of severity
      * @param message   Provided message
      * @param param     Optional parameters
+     * @see #log(Level, String, Object...)
+     * @see #log(String, Object...)
      */
     public static void log(boolean condition, Level level, String message, Object... param) {
         if (condition) LOGGER.log(level, getPrefix() + ConsoleColor.parse(message), param);
@@ -152,14 +207,12 @@ public final class Console {
      * @param level   Level of severity
      * @param message Provided message
      * @param param   Optional parameters
+     * @see #log(boolean, Level, String, Object...)
+     * @see #log(String, Object...)
      */
     public static void log(Level level, String message, Object... param) {
         log(true, level, message, param);
     }
-
-    /*
-    LOGGING METHODS
-     */
 
     /**
      * <p>Prints a standard logging message to console.</p>
@@ -169,20 +222,16 @@ public final class Console {
      *
      * @param message Provided message
      * @param param   Optional parameters
+     * @see #log(boolean, Level, String, Object...)
+     * @see #log(Level, String, Object...)
      */
     public static void log(String message, Object... param) {
         log(true, Level.INFO, message, param);
     }
 
-    /**
-     * A utility method used to return the prefix assigned to the console, if one does not exist, this method
-     * will attempt to use the plugin's name, otherwise it will use an empty string.
-     *
-     * @return Console prefix or empty string
+    /*
+    SETTER METHODS
      */
-    private static String getPrefix() {
-        return prefix != null ? prefix : (!getPluginName().isEmpty() ? ConsoleColor.parse("[" + getPluginName() + "&r] ") : "");
-    }
 
     /**
      * An additional way to set the console's prefix, the recommended way is through the
@@ -190,11 +239,33 @@ public final class Console {
      * could fit your needs better.
      *
      * @param prefix Desired prefix
-     * @return An instance of the Console chain
+     * @see #getPrefix()
      */
-    public Console setPrefix(@Nullable String prefix) {
-        Console.prefix = prefix != null ? ConsoleColor.parse("[" + prefix + "&r] ") : "";
-        return this;
+    public static void setPrefix(@Nullable String prefix) {
+        Console.PREFIX = prefix != null ? ConsoleColor.parse("[" + prefix + "&r] ") : "";
+    }
+
+    /**
+     * Used to toggle debug loggers for this class, when the toggle is set
+     * to false, all debug messages will be disabled and vice versa, all debug
+     * messages will be enabled.
+     *
+     * @param toggle Whether debug messages are enabled
+     * @see #isDebugging()
+     */
+    public static void setDebugToggle(boolean toggle) {
+        canDebug = toggle;
+    }
+
+    /**
+     * A chain method that allows you to toggle pretty print globally, any logging
+     * printed after modifying this setting will take on the new setting.
+     *
+     * @param toggle whether it should be enabled or not
+     * @see #isPrettyPrint()
+     */
+    public static void setPrettyPrint(boolean toggle) {
+        prettyPrint = toggle;
     }
 
     /*
@@ -212,15 +283,37 @@ public final class Console {
     }
 
     /**
-     * A chain method that allows you to toggle pretty print globally, any logging
-     * printed after modifying this setting will take on the new setting.
+     * Used to return the prefix assigned to the console, if one does not exist, this method
+     * will attempt to use the plugin's name, otherwise it will use an empty string.
      *
-     * @param toggle whether it should be enabled or not
-     * @return An instance of the Console chain
+     * @return Console prefix or empty string
+     * @see #setPrefix(String)
      */
-    public Console setPrettyPrint(boolean toggle) {
-        prettyPrint = toggle;
-        return this;
+    public static String getPrefix() {
+        return PREFIX != null ? PREFIX : (!getPluginName().isEmpty() ? ConsoleColor.parse("[" + getPluginName() + "&r] ") : "");
+    }
+
+    /**
+     * Returns whether this console is allowed to output messages with colored
+     * formatting (aka pretty print), if false it means this console will send
+     * messages out without formatting.
+     *
+     * @return true if pretty print is enabled
+     * @see #setPrettyPrint(boolean)
+     */
+    public static boolean isPrettyPrint() {
+        return prettyPrint;
+    }
+
+    /**
+     * Used to return whether this console is currently allowed to send debug
+     * messages, otherwise this method will return false.
+     *
+     * @return true if debugging is enabled
+     * @see #setDebugToggle(boolean)
+     */
+    public static boolean isDebugging() {
+        return canDebug;
     }
 
     /*
@@ -347,6 +440,24 @@ public final class Console {
          */
         public String getAnsiColor() {
             return ansiColor;
+        }
+    }
+
+    /**
+     * A utility class used to initialize implement this filter within our loggers
+     * it is tasked with filtering out debug messages when not enabled.
+     */
+    private static class DebugFilter implements Filter {
+
+        /**
+         * Check if a given log record should be published.
+         *
+         * @param record a LogRecord
+         * @return true if the log record should be published.
+         */
+        @Override
+        public boolean isLoggable(@NotNull LogRecord record) {
+            return canDebug && record.getMessage().contains(DEBUG_PREFIX);
         }
     }
 }
