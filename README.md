@@ -51,7 +51,7 @@ It's that simple, take a look at the supported build tools below.
 <dependency>
     <groupId>com.github.OMGitzFROST</groupId>
     <artifactId>MoleculeAPI</artifactId>
-    <version>latest</version>
+    <version>LATEST</version>
 </dependency>
 ````
 
@@ -63,7 +63,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.OMGitzFROST:MoleculeAPI:latest'
+    implementation 'com.github.OMGitzFROST:MoleculeAPI:LATEST'
 }
 ````
 
