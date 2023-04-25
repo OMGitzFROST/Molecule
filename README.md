@@ -30,7 +30,7 @@ To use MoleculeAPI in your project, you will need to add the following code into
     <dependency>
         <groupId>com.github.OMGitzFROST</groupId>
         <artifactId>MoleculeAPI</artifactId>
-        <version>1.0.1-beta</version>
+        <version>LATEST</version>
     </dependency>
 </dependencies>
 ```
@@ -43,7 +43,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.OMGitzFROST:MoleculeAPI:1.0.1-beta'
+    implementation 'com.github.OMGitzFROST:MoleculeAPI:LATEST'
 }
 ```
 {% endtab %}
