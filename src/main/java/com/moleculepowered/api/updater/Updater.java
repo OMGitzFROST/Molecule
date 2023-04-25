@@ -11,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,11 +22,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,9 +52,10 @@ public final class Updater {
     private final File dataFolder;
     private UpdateResult result = UpdateResult.UNKNOWN;
     private AbstractProvider activeProvider;
+    private Listener listener;
     private String permission;
     private final Plugin plugin;
-    private Listener listener;
+    private final boolean globalEnabled, attemptDownload;
     private boolean enabled, betaEnabled;
     private long interval;
 
@@ -76,6 +77,15 @@ public final class Updater {
         enabled = true;
         permission = "";
         dataFolder = new File(plugin.getDataFolder().getParentFile(), "Updater");
+        File configFile = new File(dataFolder, "config.yml");
+
+        // ATTEMPT TO CREATE AND/OR LOAD THE CONFIGURATION
+        FileUtil.copy(MoleculeAPI.getResource("config.yml"), configFile);
+
+        // LOAD CONFIGURATION VALUES
+        FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+        globalEnabled = config.getBoolean("enabled");
+        attemptDownload = config.getBoolean("attempt-download");
     }
 
     /*
@@ -95,7 +105,7 @@ public final class Updater {
         Validate.isTrue(!providers.isEmpty(), "Please supply at least one provider for your updater");
 
         // FIRST, VERIFY THAT ALL REQUIREMENTS ARE MET BEFORE SCHEDULING
-        if (!enabled) {
+        if (!globalEnabled || !enabled) {
             Console.info("Updater disabled, there we will not check for updates.");
             result = UpdateResult.DISABLED;
             return;
@@ -119,7 +129,7 @@ public final class Updater {
         Validate.isTrue(!providers.isEmpty(), "Please supply at least one provider for your updater");
 
         // FIRST, VERIFY THAT ALL REQUIREMENTS ARE MET BEFORE SCHEDULING
-        if (!enabled) {
+        if (!globalEnabled || !enabled) {
             Console.info("Updater disabled, there we will not check for updates.");
             result = UpdateResult.DISABLED;
             return;
@@ -206,18 +216,18 @@ public final class Updater {
      * @throws IOException when an issue occurred while downloading a file
      */
     private void attemptDownload(@Nullable String location, @NotNull File outputFile) throws IOException {
-        if (location == null) return;
+        if (!attemptDownload || location == null) return;
         if (outputFile.exists()) {
             result = UpdateResult.EXISTS;
             return;
         }
-        if (!dataFolder.exists() && !dataFolder.mkdirs())
-            throw new FileNotFoundException("Failed to create our updater's datafolder");
 
         HttpURLConnection downloadLink = (HttpURLConnection) new URL(location).openConnection();
+        downloadLink.setInstanceFollowRedirects(true);
+
         if (downloadLink.getResponseCode() == HttpURLConnection.HTTP_OK && !outputFile.exists()) {
             notifyAudience("Downloading...");
-            Files.copy(downloadLink.getInputStream(), outputFile.toPath());
+            FileUtil.copy(downloadLink.getInputStream(), outputFile);
             if (outputFile.exists()) result = UpdateResult.EXISTS;
         }
     }
