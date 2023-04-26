@@ -8,6 +8,10 @@ public enum UpdateResult {
      */
     DISABLED,
     /**
+     * Indicates that a newer version was available, and a download was completed successfully.
+     */
+    DOWNLOADED,
+    /**
      * Indicates that an update is available, but it has already been downloaded
      */
     EXISTS,
