@@ -18,9 +18,14 @@ import java.util.regex.Pattern;
  * @since 1.0.0
  */
 public final class Version {
-    private final String VERSION_PATTERN, MODIFIER_PATTERN;
-    private String version, modifier;
+    private String FULL_VERSION_PATTERN, VERSION_PATTERN, MODIFIER_PATTERN;
+    private String fullVersion, version, modifier;
     private String[] versionParts = {};
+
+    /**
+     * Used to disable this constructor from being used, this is a utility class
+     */
+    private Version() {}
 
     /**
      * <p>The main constructor for this class, the string input will be used to create a usable
@@ -35,16 +40,21 @@ public final class Version {
      * @see #Version(double)
      */
     public Version(@Nullable String input) {
+        FULL_VERSION_PATTERN = "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?";
         VERSION_PATTERN = "(?:(\\d+)\\.)?(?:(\\d+)\\.)?(\\*|\\d+)";
         MODIFIER_PATTERN = "B(ETA)?|A(LPHA)?|RC|SNAPSHOT";
 
         if (input != null) {
+            Matcher fullVersionMatcher = extractFullVersion(input);
+            if (fullVersionMatcher.find()) fullVersion = fullVersionMatcher.group();
+            else throw new IllegalArgumentException("Invalid version format: " + input);
+
             // SET VERSION NUMBER
-            Matcher versionMatch = parseVersion(input);
+            Matcher versionMatch = parseVersion(fullVersion);
             if (versionMatch.find()) version = versionMatch.group();
 
             // SET VERSION TYPE
-            Matcher modifierMatch = parseModifier(input);
+            Matcher modifierMatch = parseModifier(fullVersion);
             if (modifierMatch.find()) modifier = modifierMatch.group();
 
             // SPLIT THE VERSION INTO PARTS
@@ -89,6 +99,15 @@ public final class Version {
      */
 
     /**
+     * Used to return the full version number parsed by this class.
+     *
+     * @return Complete version number including modifier
+     */
+    public @NotNull String getFullVersion() {
+        return fullVersion;
+    }
+
+    /**
      * Used to return the version number parsed by this class, please note that this
      * method does not return the original full version number. If there was an error parsing
      * the version number with the input provided, this method will return "0.0" by default.
@@ -96,7 +115,7 @@ public final class Version {
      * @return Formatted version number
      */
     public @NotNull String getVersion() {
-        return version != null ? version : "0.0";
+        return StringUtil.nonNull(version, "0.0");
     }
 
     /**
@@ -195,6 +214,17 @@ public final class Version {
     /*
     UTILITY METHODS
      */
+
+    /**
+     * A utility method used to return a complete version number from the input provided, it extracts
+     * both version numbers and its pre-release type.
+     *
+     * @param input Provided input
+     * @return An complete version number
+     */
+    private @NotNull Matcher extractFullVersion(String input) {
+        return Pattern.compile(FULL_VERSION_PATTERN, Pattern.CASE_INSENSITIVE).matcher(input);
+    }
 
     /**
      * A utility method used to return a parsed version number derived from the provided string. Please
