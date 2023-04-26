@@ -30,6 +30,7 @@ public abstract class AbstractProvider {
         URL targetURL = new URL(format(url, Arrays.stream(param).map(String::valueOf).toArray()));
         HttpURLConnection conn = (HttpURLConnection) targetURL.openConnection();
         conn.addRequestProperty("User-Agent", "MoleculeAPI/Spigot");
+        conn.setInstanceFollowRedirects(true);
         conn.setReadTimeout(30000);
         conn.setDoOutput(true);
         conn.connect();
