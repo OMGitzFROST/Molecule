@@ -49,19 +49,25 @@ import static com.moleculepowered.api.util.StringUtil.format;
 public final class Updater {
 
     private final List<AbstractProvider> providers = new ArrayList<>();
-    private final File dataFolder;
     private UpdateResult result = UpdateResult.UNKNOWN;
     private AbstractProvider activeProvider;
     private Listener listener;
     private String permission;
-    private final Plugin plugin;
-    private final boolean globalEnabled, attemptDownload;
+    private File dataFolder;
+    private Plugin plugin;
+    private boolean globalEnabled, attemptDownload;
     private boolean enabled, betaEnabled;
     private long interval;
 
     /*
     CONSTRUCTOR
      */
+
+    /**
+     * Used to disable this constructor from being used, this is a utility class
+     */
+    private Updater() {
+    }
 
     /**
      * This constructor serves as the start of the Updater chain, its takes a plugin as its
@@ -85,7 +91,7 @@ public final class Updater {
         // LOAD CONFIGURATION VALUES
         FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         globalEnabled = config.getBoolean("enabled");
-        attemptDownload = config.getBoolean("attempt-download");
+        attemptDownload = config.getBoolean("attempt-downloads");
     }
 
     /*
@@ -152,6 +158,7 @@ public final class Updater {
     private void initialize(boolean async) {
         notifyAudience("&6Checking for a new update...");
 
+        // CREATE AN INSTANCE OF THE CURRENT PROVIDER
         Version currentVersion = new Version(plugin.getDescription().getVersion());
 
         // ITERATE THROUGH EACH PROVIDER AND ATTEMPT TO FIND ONE WITH THE LATEST UPDATE
@@ -172,19 +179,21 @@ public final class Updater {
             if (fetchedVersion.isGreaterThan(currentVersion)) {
                 if (!fetchedVersion.isUnstable() || (fetchedVersion.isUnstable() && betaEnabled)) {
                     if (!fetchedVersion.isEqual(activeProvider.getRelease())) activeProvider = provider;
-                    result = UpdateResult.UPDATE_AVAILABLE;
-
-                    // DOWNLOAD UPDATE (IF POSSIBLE)
-                    try {
-                        if (provider.getDownloadLink() != null) {
-                            File outputFile = new File(dataFolder, FileUtil.getFileName(provider.getDownloadLink()));
-                            attemptDownload(provider.getDownloadLink(), outputFile);
-                        }
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
                 }
             }
+        }
+
+        // IF FETCHED VERSION IS GREATER THAN CURRENT, SET RESULT ONCE
+        if (activeProvider.getRelease().isGreaterThan(currentVersion)) result = UpdateResult.UPDATE_AVAILABLE;
+
+        // DOWNLOAD UPDATE (IF POSSIBLE)
+        try {
+            if (activeProvider.getDownloadLink() != null) {
+                File outputFile = new File(dataFolder, FileUtil.getFileName(activeProvider.getDownloadLink()));
+                attemptDownload(activeProvider.getDownloadLink(), outputFile);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
 
         // CALL THE UPDATE COMPLETE EVENT ONCE ALL PROVIDERS WERE ITERATED
@@ -226,10 +235,13 @@ public final class Updater {
         downloadLink.setInstanceFollowRedirects(true);
 
         if (downloadLink.getResponseCode() == HttpURLConnection.HTTP_OK && !outputFile.exists()) {
-            notifyAudience("Downloading...");
             FileUtil.copy(downloadLink.getInputStream(), outputFile);
-            if (outputFile.exists()) result = UpdateResult.EXISTS;
+            if (outputFile.exists()) result = UpdateResult.DOWNLOADED;
+            return;
         }
+
+        // SET RESULT TO EXISTS IF A THE DOWNLOAD WAS ALREADY DOWNLOADED
+        if (outputFile.exists()) result = UpdateResult.EXISTS;
     }
 
     /**
@@ -316,51 +328,6 @@ public final class Updater {
     public @NotNull Updater setEventHandler(@NotNull Listener listener) {
         this.listener = listener;
         return this;
-    }
-
-    /**
-     * Used to return whether this updater should also notify when unstable versions are
-     * available, please note that if this method returns false, it means that release only
-     * versions will trigger notifications, and unstable versions such as BETA, ALPHA, RC will
-     * not trigger a notification.
-     *
-     * @return true if unstable versions are enabled
-     * @see #setBetaToggle(boolean)
-     */
-    public boolean isBetaEnabled() {
-        return betaEnabled;
-    }
-
-    /**
-     * Used to return whether this updater is currently enabled
-     *
-     * @return true if enabled
-     * @see #setEnableToggle(boolean)
-     */
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
-     * Return's true if the provided player is considered an authorized audience member. Otherwise, this
-     * method will return false.
-     *
-     * @param player Target player
-     * @return true if player is an authorized audience member
-     * @see #getAudience()
-     */
-    public boolean isAudienceMember(@Nullable OfflinePlayer player) {
-        return player != null && (player.getPlayer() != null && getAudience().contains(player.getPlayer()));
-    }
-
-    /**
-     * Returns the interval in which this updater will check for updates
-     *
-     * @return Interval in which updates will be checked.
-     * @see #setInterval(String)
-     */
-    public long getInterval() {
-        return interval;
     }
 
     /**
@@ -511,6 +478,51 @@ public final class Updater {
         return result;
     }
 
+    /**
+     * Returns the interval in which this updater will check for updates
+     *
+     * @return Interval in which updates will be checked.
+     * @see #setInterval(String)
+     */
+    public long getInterval() {
+        return interval;
+    }
+
+    /**
+     * Used to return whether this updater should also notify when unstable versions are
+     * available, please note that if this method returns false, it means that release only
+     * versions will trigger notifications, and unstable versions such as BETA, ALPHA, RC will
+     * not trigger a notification.
+     *
+     * @return true if unstable versions are enabled
+     * @see #setBetaToggle(boolean)
+     */
+    public boolean isBetaEnabled() {
+        return betaEnabled;
+    }
+
+    /**
+     * Used to return whether this updater is currently enabled
+     *
+     * @return true if enabled
+     * @see #setEnableToggle(boolean)
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * Return's true if the provided player is considered an authorized audience member. Otherwise, this
+     * method will return false.
+     *
+     * @param player Target player
+     * @return true if player is an authorized audience member
+     * @see #getAudience()
+     */
+    public boolean isAudienceMember(@Nullable OfflinePlayer player) {
+        return player != null && (player.getPlayer() != null && getAudience().contains(player.getPlayer()));
+    }
+
     /*
     EVENT HANDLER CLASS
      */
@@ -540,7 +552,10 @@ public final class Updater {
                     Console.info("No updates were found...");
                     break;
                 case EXISTS:
-                    Console.info("&aThe latest version of &e{0} &ais already downloaded, Check your Update folder", plugin.getName());
+                    Console.info("&e{0} v{1} &ais already downloaded, Please Check your Update folder and install it", plugin.getName(), latestVersion);
+                    break;
+                case DOWNLOADED:
+                    Console.info("&aSuccessfully downloaded (&e{0} v{1}&a), Please install it from you update folder", plugin.getName(), latestVersion);
                     break;
                 case UPDATE_AVAILABLE:
                     Console.info(StringUtils.repeat('*', 60));
@@ -584,6 +599,12 @@ public final class Updater {
             switch (result) {
                 case LATEST:
                     player.sendMessage("You have the latest version of this plugin");
+                    break;
+                case EXISTS:
+                    player.sendMessage(format("&6The latest version of {0} is already downloaded, please check the update's folder", plugin.getName()));
+                    break;
+                case DOWNLOADED:
+                    player.sendMessage(format("&aSuccessfully downloaded (&e{0} v{1}&a), Please install it from you update folder", plugin.getName(), provider.getRelease().getFullVersion()));
                     break;
                 case UPDATE_AVAILABLE:
                     player.sendMessage(format("&3Version (&f{0}&3) is now available for &6{1}&3.", provider.getRelease().getVersion(), plugin.getName()));
