@@ -1,5 +1,5 @@
 ---
-description: The main component responsible for accessing updated information over the web
+description: Responsible for handling update checks for some of the major platforms
 ---
 
 # Providers
