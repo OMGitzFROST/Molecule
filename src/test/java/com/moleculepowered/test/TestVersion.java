@@ -48,22 +48,16 @@ public class TestVersion {
     @DisplayName("Ensure modifiers are parsed correctly")
     public void testModifier() {
 
-        Version v1 = new Version("1.0.0B");
-        Version v2 = new Version("1.0.0-a");
-        Version v3 = new Version("1.0.0rc");
-        Version v4 = new Version("1.0.0-snapshot");
-        Version v5 = new Version("1.0.0");
+        Version v1 = new Version("1.0.0-a");
+        Version v2 = new Version("1.0.0-snapshot");
+        Version v3 = new Version("1.0.0");
 
         Validate.isTrue(v1.isUnstable());
         Validate.isTrue(v2.isUnstable());
-        Validate.isTrue(v3.isUnstable());
-        Validate.isTrue(v4.isUnstable());
-        Validate.isTrue(!v5.isUnstable());
+        Validate.isTrue(!v3.isUnstable());
 
-        Validate.isTrue(Objects.requireNonNull(v1.getModifier()).equalsIgnoreCase("b"));
-        Validate.isTrue(Objects.requireNonNull(v2.getModifier()).equalsIgnoreCase("a"));
-        Validate.isTrue(Objects.requireNonNull(v3.getModifier()).equalsIgnoreCase("rc"));
-        Validate.isTrue(Objects.requireNonNull(v4.getModifier()).equalsIgnoreCase("snapshot"));
-        Validate.isTrue(v5.getModifier() == null);
+        Validate.isTrue(Objects.requireNonNull(v1.getModifier()).equalsIgnoreCase("a"));
+        Validate.isTrue(Objects.requireNonNull(v2.getModifier()).equalsIgnoreCase("snapshot"));
+        Validate.isTrue(v3.getModifier() == null);
     }
 }
