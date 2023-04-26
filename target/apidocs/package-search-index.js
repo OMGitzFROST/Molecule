@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.moleculepowered.api.event"},{"l":"com.moleculepowered.api.event.updater"},{"l":"com.moleculepowered.api.exception"},{"l":"com.moleculepowered.api.updater"},{"l":"com.moleculepowered.api.updater.provider"},{"l":"com.moleculepowered.api.util"}];updateSearchResults();
