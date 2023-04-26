@@ -1,0 +1,6 @@
+com.moleculepowered.api.util
+com.moleculepowered.api.updater.provider
+com.moleculepowered.api.updater
+com.moleculepowered.api.exception
+com.moleculepowered.api.event
+com.moleculepowered.api.event.updater
