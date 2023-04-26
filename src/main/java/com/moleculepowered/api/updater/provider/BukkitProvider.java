@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.moleculepowered.api.exception.ProviderFetchException;
+import com.moleculepowered.api.util.StringUtil;
 import com.moleculepowered.api.util.Version;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,11 +15,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.util.Set;
 
+import static com.moleculepowered.api.util.StringUtil.format;
+
 public class BukkitProvider extends AbstractProvider {
 
     private final String API_KEY;
     private final int resourceID;
-    private String downloadLink, latestVersion;
+    private String downloadLink, changeLogLink, latestVersion;
 
     public BukkitProvider(int resourceID, @Nullable String apiKey) {
         this.resourceID = resourceID;
@@ -50,7 +53,14 @@ public class BukkitProvider extends AbstractProvider {
             latestVersion = resource.get("name").getAsString();
             downloadLink = resource.get("downloadUrl").getAsString();
 
+            HttpURLConnection temp = connection("https://dev.bukkit.org/projects/{0}", resourceID);
+            String fileName = StringUtil.substring(temp.getURL().toString(), "/", +1);
+            String fileID = StringUtil.substring(resource.get("fileUrl").getAsString(), "/", +1);
+
+            changeLogLink = format("https://www.curseforge.com/minecraft/bukkit-plugins/{0}/files/{1}", fileName, fileID);
+
             // CLOSE CONNECTION
+            temp.disconnect();
             conn.disconnect();
         } catch (IOException ex) {
             throw new ProviderFetchException("The provider failed to fetch the latest update", ex);
@@ -84,7 +94,7 @@ public class BukkitProvider extends AbstractProvider {
      */
     @Override
     public @Nullable String getChangelogLink() {
-        return null;
+        return changeLogLink;
     }
 
     /**
