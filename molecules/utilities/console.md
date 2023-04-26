@@ -37,13 +37,13 @@ Different loggers serve different purposes, take a look at the table below for a
 **LEGEND:    ✅ = Supported    ⛔️ = Unsupported**
 {% endhint %}
 
-#### Color Formatting
+## Color Formatting
 
 We made color coding your messages easy to use, in this section we will focus mainly on parsing color codes. Achieving this is also very simple, simply add color codes to your messages and that's it, the logger will handle the rest, although please keep in mind that the logger you use must support color parsing, otherwise your message will take form to accommodate the preset color defined by the logger.
 
 Disabling color formatting for ALL loggers is very simple. You can simply call the static method `Console#setPrettyPrint(Boolean)`anywhere within your plugin to disable it, just make sure you set the Boolean value to 'false'. Currently, we don't support disabling color formatting for individual loggers so to bypass this, you can use the log method and define the level you wish to use.
 
-### Example Usage
+## Example Usage
 
 Making the console unique is very important to us, therefore we are constantly adding new customization features to it. Also, we made customization as easy as possible as well please take a look at the example below to learn how to implement customization for this class.
 

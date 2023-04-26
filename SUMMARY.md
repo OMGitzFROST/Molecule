@@ -12,8 +12,6 @@
   * [Notifications](molecules/updater/notifications.md)
 * [Utilities](molecules/utilities/README.md)
   * [Console](molecules/utilities/console.md)
-  * [Time](molecules/utilities/time.md)
-  * [Version](molecules/utilities/version.md)
 
 ***
 
