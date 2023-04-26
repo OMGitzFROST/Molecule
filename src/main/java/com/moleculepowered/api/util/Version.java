@@ -36,7 +36,6 @@ public final class Version {
      * that and will return N/A as its value</p>
      *
      * @param input Provided input
-     * @see #Version(int)
      * @see #Version(double)
      */
     public Version(@Nullable String input) {
@@ -71,23 +70,6 @@ public final class Version {
      * that and will return N/A as its value</p>
      *
      * @param input Provided input
-     * @see #Version(double)
-     * @see #Version(String)
-     */
-    public Version(int input) {
-        this(String.valueOf(input));
-    }
-
-    /**
-     * <p>The main constructor for this class, the string input will be used to create a usable
-     * version that can be compared, and broken down into its parts, such as major, minor, patch versions, and
-     * its version type such as BETA, ALPHA, etc.</p>
-     *
-     * <p>Please note that this method does allow you to provide a null value, this method has built in checks for
-     * that and will return N/A as its value</p>
-     *
-     * @param input Provided input
-     * @see #Version(int)
      * @see #Version(String)
      */
     public Version(double input) {
@@ -108,9 +90,11 @@ public final class Version {
     }
 
     /**
-     * Used to return the version number parsed by this class, please note that this
-     * method does not return the original full version number. If there was an error parsing
-     * the version number with the input provided, this method will return "0.0" by default.
+     * <p>Used to return the version number parsed by this class, please note that this
+     * method doesn't return the original full version number.</p>
+     *
+     * <p>If there was an error parsing the version number with the input provided,
+     * this method will return "0.0" by default.</p>
      *
      * @return Formatted version number
      */
@@ -220,7 +204,7 @@ public final class Version {
      * both version numbers and its pre-release type.
      *
      * @param input Provided input
-     * @return An complete version number
+     * @return A complete version number
      */
     private @NotNull Matcher extractFullVersion(String input) {
         return Pattern.compile(FULL_VERSION_PATTERN, Pattern.CASE_INSENSITIVE).matcher(input);
@@ -231,7 +215,7 @@ public final class Version {
      * note that if this the provided input is null, this method will return an empty string
      *
      * @param input Provided input
-     * @return The version modifier or an null string
+     * @return The version modifier or a null string
      */
     private @NotNull Matcher parseVersion(String input) {
         return Pattern.compile(VERSION_PATTERN, Pattern.CASE_INSENSITIVE).matcher(input);
