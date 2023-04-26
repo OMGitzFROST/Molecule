@@ -46,11 +46,6 @@
         <url>https://github.com/OMGitzFROST/MoleculeAPI/issues</url>
     </issueManagement>
 
-    <ciManagement>
-        <system>Travis-CI</system>
-        <url>https://travis-ci.org/OMGitzFROST/MoleculeAPI</url>
-    </ciManagement>
-
     <repositories>
         <repository>
             <id>spigot-repo</id>
