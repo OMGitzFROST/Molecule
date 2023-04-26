@@ -6,10 +6,6 @@ description: >-
 
 # Notifications
 
-{% hint style="warning" %}
-The docs are currently a work in progress, And therefore some parts may be outdated or no longer supported.&#x20;
-{% endhint %}
-
 ## Overview
 
 Welcome to the notifications page for our updater, in this wiki you will learn how our notification system works, as well as how you can customize one yourself. Our notifications are event-based, which means that when the updater completes its update check, it will trigger an event that is used to send notifications to the proper audience.&#x20;

@@ -4,10 +4,6 @@ description: The main component responsible for accessing updated information ov
 
 # Providers
 
-{% hint style="warning" %}
-The docs are currently a work in progress, And therefore some parts may be outdated or no longer supported.&#x20;
-{% endhint %}
-
 ## Overview
 
 Welcome to the provider's page for our updater, these providers are the most important piece that makes our updater different, they provide developers with an easy-to-use way to access release information from any platform they wish.
