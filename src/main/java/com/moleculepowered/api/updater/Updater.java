@@ -316,6 +316,19 @@ public final class Updater {
     }
 
     /**
+     * Sets whether downloads should be attempted, please note that not all plugins may
+     * allow downloading so even with this enabled, the updater might have a hard time downloading
+     * your update, an example is a project page with no update files.
+     *
+     * @param enabled whether updates should attempt ro download
+     * @return an instance of this updater
+     */
+    public @NotNull Updater setDownloadToggle(boolean enabled) {
+        this.attemptDownload = enabled;
+        return this;
+    }
+
+    /**
      * <p>Sets the handler that will be called when an update check is completed.</p>
      *
      * <p>Please note that in-order for you to customize the behavior when sending notifications,
