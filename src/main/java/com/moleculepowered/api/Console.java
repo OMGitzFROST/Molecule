@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -22,8 +23,8 @@ public final class Console {
 
     private static final Logger LOGGER = Logger.getLogger("MoleculeAPI");
     private static final String DEBUG_PREFIX = "[DEBUG]";
-    private static String PREFIX;
     private static boolean prettyPrint = true, canDebug = false;
+    private static String PREFIX;
 
     /*
     GLOBALLY SETS THE DEBUG FILTER WITHOUT NEEDING TO BE EXPLICITLY CALLED UPON
@@ -33,14 +34,9 @@ public final class Console {
     }
 
     /**
-     * A main constructor used by this class. This constructor does not allow you to
-     * add a prefix, but take a look at the "see also" if you want to use a custom prefix.
-     *
-     * @see #Console(String)
+     * Used to disable this constructor from being used, this is a utility class
      */
-    public Console() {
-        this(null);
-    }
+    private Console() {}
 
     /**
      * A main constructor used by this class. With it, you can set the prefix that will
@@ -68,9 +64,29 @@ public final class Console {
      * @param param   Optional parameters
      * @see #setDebugToggle(boolean)
      * @see #debug(boolean, String, Object...)
+     * @see #debug(boolean, Collection, Object...)
+     * @see #debug(Collection, Object...)
      */
     public static void debug(String message, Object... param) {
         debug(true, message, param);
+    }
+
+    /**
+     * <p>Prints a collection of debug messages to console. Please note that in-order for
+     * you to see these messages, debug must be enabled for the console, by default debug messages are disabled.</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param messages Collection of messages
+     * @param param   Optional parameters
+     * @see #setDebugToggle(boolean)
+     * @see #debug(String, Object...)
+     * @see #debug(boolean, String, Object...)
+     * @see #debug(boolean, Collection, Object...)
+     */
+    public static void debug(Collection<String> messages, Object... param) {
+        debug(true, messages, param);
     }
 
     /**
@@ -85,9 +101,28 @@ public final class Console {
      * @param param   Optional parameters
      * @see #setDebugToggle(boolean)
      * @see #debug(String, Object...)
+     * @see #debug(boolean, Collection, Object...)
      */
     public static void debug(boolean condition, String message, Object... param) {
         log(condition, Level.INFO, DEBUG_PREFIX + " " + message, param);
+    }
+
+    /**
+     * <p>Prints a collection of debug messages to console if a condition is met. Please note that in-order for
+     * you to see these messages, debug must be enabled for the console, by default debug messages are disabled.</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param condition Whether this logger should actually log
+     * @param messages Collection of messages
+     * @param param   Optional parameters
+     * @see #setDebugToggle(boolean)
+     * @see #debug(String, Object...)
+     * @see #debug(boolean, String, Object...)
+     */
+    public static void debug(boolean condition, @NotNull Collection<String> messages, Object... param) {
+        messages.forEach(m -> debug(condition, m, param));
     }
 
     /**
@@ -99,9 +134,27 @@ public final class Console {
      * @param message Provided message
      * @param param   Optional parameters
      * @see #info(boolean, String, Object...)
+     * @see #info(boolean, Collection, Object...)
+     * @see #info(Collection, Object...)
      */
     public static void info(String message, Object... param) {
         info(true, message, param);
+    }
+
+    /**
+     * Prints a collection of informational messages to console.
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param messages   Collection of messages message
+     * @param param     Optional parameters
+     * @see #info(String, Object...)
+     * @see #info(boolean, String, Object...)
+     * @see #info(boolean, Collection, Object...)
+     */
+    public static void info(Collection<String> messages, Object... param) {
+        info(true, messages, param);
     }
 
     /**
@@ -114,9 +167,28 @@ public final class Console {
      * @param message   Provided message
      * @param param     Optional parameters
      * @see #info(String, Object...)
+     * @see #info(boolean, Collection, Object...)
+     * @see #info(Collection, Object...)
      */
     public static void info(boolean condition, String message, Object... param) {
         log(condition, Level.INFO, message, param);
+    }
+
+    /**
+     * Prints a collection informational messages to console if a condition is met.
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param condition Whether this logger should actually log
+     * @param messages   Collection of messages message
+     * @param param     Optional parameters
+     * @see #info(String, Object...)
+     * @see #info(boolean, String, Object...)
+     * @see #info(Collection, Object...)
+     */
+    public static void info(boolean condition, @NotNull Collection<String> messages, Object... param) {
+        messages.forEach(m -> info(condition, m, param));
     }
 
     /**
@@ -128,9 +200,27 @@ public final class Console {
      * @param message Provided message
      * @param param   Optional parameters
      * @see #warning(boolean, String, Object...)
+     * @see #warning(boolean, Collection, Object...)
+     * @see #warning(Collection, Object...)
      */
     public static void warning(String message, Object... param) {
         warning(true, message, param);
+    }
+
+    /**
+     * <p>Prints a collection of warning messages to console.</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param messages   Collection of messages
+     * @param param     Optional parameters
+     * @see #warning(String, Object...)
+     * @see #warning(boolean, String, Object...)
+     * @see #warning(boolean, Collection, Object...)
+     */
+    public static void warning(Collection<String> messages, Object... param) {
+        warning(true, messages, param);
     }
 
     /**
@@ -143,9 +233,28 @@ public final class Console {
      * @param message   Provided message
      * @param param     Optional parameters
      * @see #warning(String, Object...)
+     * @see #warning(boolean, Collection, Object...)
+     * @see #warning(Collection, Object...)
      */
     public static void warning(boolean condition, String message, Object... param) {
-        log(condition, Level.WARNING, ConsoleColor.colorize(ConsoleColor.GOLD, message), param);
+        log(condition, Level.WARNING, ConsoleColor.colorize(ConsoleColor.GOLD, String.valueOf(message)), param);
+    }
+
+    /**
+     * <p>Prints a collection of warning messages to console if a condition is met</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param condition Whether this logger should actually log
+     * @param messages   Collection of messages
+     * @param param     Optional parameters
+     * @see #warning(String, Object...)
+     * @see #warning(boolean, String, Object...)
+     * @see #warning(Collection, Object...)
+     */
+    public static void warning(boolean condition, @NotNull Collection<String> messages, Object... param) {
+        messages.forEach(m -> warning(condition, m, param));
     }
 
     /**
@@ -157,9 +266,27 @@ public final class Console {
      * @param message Provided message
      * @param param   Optional parameters
      * @see #severe(boolean, String, Object...)
+     * @see #severe(boolean, Collection, Object...)
+     * @see #severe(Collection, Object...)
      */
     public static void severe(String message, Object... param) {
         severe(true, message, param);
+    }
+
+    /**
+     * <p>Prints a collection of severe messages to console.</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param messages   Collection of messages
+     * @param param     Optional parameters
+     * @see #severe(String, Object...)
+     * @see #severe(boolean, String, Object...)
+     * @see #severe(boolean, Collection, Object...)
+     */
+    public static void severe(Collection<String> messages, Object... param) {
+        severe(true, messages, param);
     }
 
     /**
@@ -172,9 +299,28 @@ public final class Console {
      * @param message   Provided message
      * @param param     Optional parameters
      * @see #severe(String, Object...)
+     * @see #severe(boolean, Collection, Object...)
+     * @see #severe(Collection, Object...)
      */
     public static void severe(boolean condition, String message, Object... param) {
-        log(condition, Level.SEVERE, ConsoleColor.colorize(ConsoleColor.RED, message), param);
+        log(condition, Level.SEVERE, ConsoleColor.colorize(ConsoleColor.RED, String.valueOf(message)), param);
+    }
+
+    /**
+     * <p>Prints a collection of severe messages to console if a condition is met.</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param condition Whether this logger should actually log
+     * @param messages   Collection of messages
+     * @param param     Optional parameters
+     * @see #severe(String, Object...)
+     * @see #severe(boolean, String, Object...)
+     * @see #severe(Collection, Object...)
+     */
+    public static void severe(boolean condition, @NotNull Collection<String> messages, Object... param) {
+        messages.forEach(m -> severe(condition, m, param));
     }
 
     /*
@@ -191,11 +337,34 @@ public final class Console {
      * @param level     Level of severity
      * @param message   Provided message
      * @param param     Optional parameters
+     * @see #log(boolean, Level, Collection, Object...)
+     * @see #log(Level, Collection, Object...)
      * @see #log(Level, String, Object...)
+     * @see #log(Collection, Object...)
      * @see #log(String, Object...)
      */
     public static void log(boolean condition, Level level, String message, Object... param) {
-        if (condition) LOGGER.log(level, getPrefix() + ConsoleColor.parse(message), param);
+        if (condition) LOGGER.log(level, getPrefix() + ConsoleColor.parse(String.valueOf(message)), param);
+    }
+
+    /**
+     * <p>Prints a collection of messages to console with a specified level of severity if a condition is met</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param condition Whether this logger should actually log
+     * @param level     Level of severity
+     * @param messages   Collection of messages
+     * @param param     Optional parameters
+     * @see #log(boolean, Level, String, Object...)
+     * @see #log(Level, Collection, Object...)
+     * @see #log(Level, String, Object...)
+     * @see #log(Collection, Object...)
+     * @see #log(String, Object...)
+     */
+    public static void log(boolean condition, Level level, @NotNull Collection<String> messages, Object... param) {
+        messages.forEach(m -> log(condition, level, m, param));
     }
 
     /**
@@ -208,10 +377,32 @@ public final class Console {
      * @param message Provided message
      * @param param   Optional parameters
      * @see #log(boolean, Level, String, Object...)
+     * @see #log(boolean, Level, Collection, Object...)
+     * @see #log(Level, Collection, Object...)
+     * @see #log(Collection, Object...)
      * @see #log(String, Object...)
      */
     public static void log(Level level, String message, Object... param) {
         log(true, level, message, param);
+    }
+
+    /**
+     * <p>Prints a collection of messages to console with a specified level of severity</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param level   Level of severity
+     * @param messages Provided message
+     * @param param   Optional parameters
+     * @see #log(boolean, Level, String, Object...)
+     * @see #log(boolean, Level, Collection, Object...)
+     * @see #log(Collection, Object...)
+     * @see #log(Level, String, Object...)
+     * @see #log(String, Object...)
+     */
+    public static void log(Level level, Collection<String> messages, Object... param) {
+        log(true, level, messages, param);
     }
 
     /**
@@ -223,10 +414,31 @@ public final class Console {
      * @param message Provided message
      * @param param   Optional parameters
      * @see #log(boolean, Level, String, Object...)
+     * @see #log(boolean, Level, Collection, Object...)
      * @see #log(Level, String, Object...)
+     * @see #log(Level, Collection, Object...)
+     * @see #log(Collection, Object...)
      */
     public static void log(String message, Object... param) {
         log(true, Level.INFO, message, param);
+    }
+
+    /**
+     * <p>Prints a collection of standard logging messages to console.</p>
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param messages Collection of messages
+     * @param param   Optional parameters
+     * @see #log(boolean, Level, String, Object...)
+     * @see #log(boolean, Level, Collection, Object...)
+     * @see #log(Level, String, Object...)
+     * @see #log(String, Object...)
+     * @see #log(Level, Collection, Object...)
+     */
+    public static void log(Collection<String> messages, Object... param) {
+        log(true, Level.INFO, messages, param);
     }
 
     /*
@@ -235,7 +447,7 @@ public final class Console {
 
     /**
      * An additional way to set the console's prefix, the recommended way is through the
-     * {@link #Console(String)} constructor but this method serves as an alternative the
+     * {@link #Console(String)} constructor but this method serves as an alternative they
      * could fit your needs better.
      *
      * @param prefix Desired prefix
@@ -295,7 +507,7 @@ public final class Console {
 
     /**
      * Returns whether this console is allowed to output messages with colored
-     * formatting (aka pretty print), if false it means this console will send
+     * formatting (aka pretty print), if false, it means this console will send
      * messages out without formatting.
      *
      * @return true if pretty print is enabled
@@ -326,7 +538,7 @@ public final class Console {
      *
      * @author OMGitzFROST
      */
-    public enum ConsoleColor {
+    private enum ConsoleColor {
 
         BLACK('0', 0, "\u001b[38;5;%dm"),
         DARK_GREEN('2', 2, "\u001b[38;5;%dm"),
