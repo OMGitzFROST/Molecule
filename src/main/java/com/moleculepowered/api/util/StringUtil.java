@@ -110,4 +110,34 @@ public final class StringUtil {
     public static @NotNull String nonNull(JsonElement element) {
         return nonNull(element, "");
     }
+
+    /*
+    SUBSTRING METHODS
+     */
+
+    /**
+     * Returns the substring from the last instance of the str.
+     *
+     * @param input Provided input
+     * @param str Substring reference
+     * @param offset Offset for substring
+     * @return a substring derived from the main input.
+     * @see #substring(String, String)
+     */
+    public static @NotNull String substring(@NotNull String input, String str, int offset) {
+        int index = input.lastIndexOf(str) + offset;
+        return input.substring(index);
+    }
+
+    /**
+     * Returns the substring from the last instance of the str.
+     *
+     * @param input Provided input
+     * @param str Substring reference
+     * @return a substring derived from the main input.
+     * @see #substring(String, String, int)
+     */
+    public static @NotNull String substring(@NotNull String input, String str) {
+        return substring(input, str, 0);
+    }
 }
