@@ -1,6 +1,5 @@
 package com.moleculepowered.api.util;
 
-import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -138,9 +137,7 @@ public final class Version {
      * @return true if greater than
      */
     public boolean isGreaterThan(@NotNull Version version) {
-        ComparableVersion version1 = new ComparableVersion(getVersion());
-        ComparableVersion version2 = new ComparableVersion(version.getVersion());
-        return version1.compareTo(version2) > 0;
+        return compare(getVersion(), version.getVersion()) == 1;
     }
 
     /**
@@ -150,9 +147,7 @@ public final class Version {
      * @return true if less than
      */
     public boolean isLessThan(@NotNull Version version) {
-        ComparableVersion version1 = new ComparableVersion(getVersion());
-        ComparableVersion version2 = new ComparableVersion(version.getVersion());
-        return version1.compareTo(version2) < 0;
+        return compare(getVersion(), version.getVersion()) == -1;
     }
 
     /**
@@ -162,9 +157,7 @@ public final class Version {
      * @return true if equal
      */
     public boolean isEqual(@NotNull Version version) {
-        ComparableVersion version1 = new ComparableVersion(getVersion());
-        ComparableVersion version2 = new ComparableVersion(version.getVersion());
-        return version1.compareTo(version2) == 0;
+        return compare(getVersion(), version.getVersion()) == 0;
     }
 
     /*
@@ -208,5 +201,42 @@ public final class Version {
      */
     private @NotNull Matcher parseModifier(String input) {
         return Pattern.compile(MODIFIER_PATTERN, Pattern.CASE_INSENSITIVE).matcher(input);
+    }
+
+    /**
+     * <p>A utility method used to return an integer that will determine whether
+     * the provided versions are greater than, less than, or equal to.</p>
+     *
+     * <p>Below are the results that will be returned and what they mean.</p>
+     * <p>(-1) = Less than | (0) = Equal to | (1) = Greater than</p>
+     *
+     * @param version1 Original version
+     * @param version2 Target version
+     * @return an integer determining whether its greater, less, or equal to
+     */
+    private int compare(@NotNull String version1, @NotNull String version2) {
+        String[] arr1 = version1.split("\\.");
+        String[] arr2 = version2.split("\\.");
+
+        int i = 0;
+        while (i < arr1.length || i < arr2.length) {
+            if (i < arr1.length && i < arr2.length) {
+                if (Integer.parseInt(arr1[i]) < Integer.parseInt(arr2[i])) {
+                    return -1;
+                } else if (Integer.parseInt(arr1[i]) > Integer.parseInt(arr2[i])) {
+                    return 1;
+                }
+            } else if (i < arr1.length) {
+                if (Integer.parseInt(arr1[i]) != 0) {
+                    return 1;
+                }
+            } else {
+                if (Integer.parseInt(arr2[i]) != 0) {
+                    return -1;
+                }
+            }
+            i++;
+        }
+        return 0;
     }
 }
