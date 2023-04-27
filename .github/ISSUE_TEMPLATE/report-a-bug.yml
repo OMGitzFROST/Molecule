@@ -1,0 +1,63 @@
+name: Report bug
+description: Report a bug in MoleculeAPI.
+labels: 'bug: unconfirmed'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a MoleculeAPI bug! Fill out the form below to provide us with info to help fix the bug.
+        Only use this if you're 100% sure you've found a bug and can reproduce it. If you're looking for general help with MoleculeAPI, try the Q&A forum or our Discord server.
+  - type: dropdown
+    attributes:
+      label: Type of bug
+      description: What type of bug is this? Choose all that apply.
+      multiple: true
+      options:
+        - Performance issue or memory leak
+        - Compatibility issue
+        - Error in console
+        - Other unexpected behaviour
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Error log (if applicable)
+      description: If you are reporting a console error, upload any relevant log excerpts to either https://paste.gg or https://gist.github.com, save and the paste the link in this box. If you included those files in the same paste as your startup log, paste the same link here.
+      placeholder: "Example: https://paste.gg/p/anonymous/109dd6a10a734a3aa430d5a351ea5210"
+
+  - type: textarea
+    attributes:
+      label: Bug description
+      description: Describe roughly what the bug is here.
+      placeholder: |
+        Example: "The updater is downloading the wrong file"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: Provide an example of how to trigger the bug.
+      placeholder: |
+        Example:
+        1. Add my provider as Bukkit with ID #12345
+        2. Run the scheduled task
+        3. Wrong file gets downloaded
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected behaviour
+      description: Explain what you should expect to happen.
+      placeholder: |
+        Example: "The correct update file should be downloaded"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Actual behaviour
+      description: Explain what actually happens.
+      placeholder: |
+        Example: "Wrong file downloaded, and wrong version number too"
+    validations:
+      required: true
