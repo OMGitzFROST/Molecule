@@ -194,7 +194,7 @@ public final class Version {
     /**
      * A utility method used to return a parsed modifier derived from a version string, these
      * modifiers include BETA, ALPHA, RELEASE CANDIDATE, ETC. Please note that if the provided string is
-     * null, this method will return an null string.
+     * null, this method will return a null string.
      *
      * @param input Provided input
      * @return The version modifier or an empty string
