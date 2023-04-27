@@ -192,6 +192,72 @@ public final class Console {
     }
 
     /**
+     * Prints an success message to console.
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param message Provided message
+     * @param param   Optional parameters
+     * @see #success(boolean, String, Object...)
+     * @see #success(boolean, Collection, Object...)
+     * @see #success(Collection, Object...)
+     */
+    public static void success(String message, Object... param) {
+        success(true, message, param);
+    }
+
+    /**
+     * Prints a collection of success messages to console.
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param messages Collection of messages message
+     * @param param    Optional parameters
+     * @see #success(String, Object...)
+     * @see #success(boolean, String, Object...)
+     * @see #success(boolean, Collection, Object...)
+     */
+    public static void success(Collection<String> messages, Object... param) {
+        success(true, messages, param);
+    }
+
+    /**
+     * Prints a success message to console if a condition is met.
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param condition Whether this logger should actually log
+     * @param message   Provided message
+     * @param param     Optional parameters
+     * @see #success(String, Object...)
+     * @see #success(boolean, Collection, Object...)
+     * @see #success(Collection, Object...)
+     */
+    public static void success(boolean condition, String message, Object... param) {
+        log(condition, Level.INFO, ConsoleColor.colorize(ConsoleColor.GREEN, message), param);
+    }
+
+    /**
+     * Prints a collection success messages to console if a condition is met.
+     *
+     * <p>If {@link #prettyPrint} is set to true, this method will also parse color
+     * code, providing a color console output, otherwise this method will simply log the message</p>
+     *
+     * @param condition Whether this logger should actually log
+     * @param messages  Collection of messages message
+     * @param param     Optional parameters
+     * @see #success(String, Object...)
+     * @see #success(boolean, String, Object...)
+     * @see #success(Collection, Object...)
+     */
+    public static void success(boolean condition, @NotNull Collection<String> messages, Object... param) {
+        messages.forEach(m -> success(condition, m, param));
+    }
+
+    /**
      * <p>Prints a warning message to console</p>
      *
      * <p>If {@link #prettyPrint} is set to true, this method will also parse color
@@ -237,7 +303,7 @@ public final class Console {
      * @see #warning(Collection, Object...)
      */
     public static void warning(boolean condition, String message, Object... param) {
-        log(condition, Level.WARNING, ConsoleColor.colorize(ConsoleColor.GOLD, String.valueOf(message)), param);
+        log(condition, Level.WARNING, ConsoleColor.colorize(ConsoleColor.GOLD, message), param);
     }
 
     /**
@@ -303,7 +369,7 @@ public final class Console {
      * @see #severe(Collection, Object...)
      */
     public static void severe(boolean condition, String message, Object... param) {
-        log(condition, Level.SEVERE, ConsoleColor.colorize(ConsoleColor.RED, String.valueOf(message)), param);
+        log(condition, Level.SEVERE, ConsoleColor.colorize(ConsoleColor.RED, message), param);
     }
 
     /**
@@ -344,7 +410,7 @@ public final class Console {
      * @see #log(String, Object...)
      */
     public static void log(boolean condition, Level level, String message, Object... param) {
-        if (condition) LOGGER.log(level, getPrefix() + ConsoleColor.parse(String.valueOf(message)), param);
+        if (condition) LOGGER.log(level, getPrefix() + ConsoleColor.parse(message), param);
     }
 
     /**
