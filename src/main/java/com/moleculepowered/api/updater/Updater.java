@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -317,7 +318,7 @@ public final class Updater {
 
     /**
      * Sets whether downloads should be attempted, please note that not all plugins may
-     * allow downloading so even with this enabled, the updater might have a hard time downloading
+     * allow downloading, so even with this enabled, the updater might have a hard time downloading
      * your update, an example is a project page with no update files.
      *
      * @param enabled whether updates should attempt ro download
@@ -405,10 +406,45 @@ public final class Updater {
      * @param input Provided input
      * @return an instance of this updater
      * @throws IllegalArgumentException when the input is not valid
+     * @see #setInterval(Duration)
+     * @see #setInterval(long)
      * @see #getInterval()
      */
     public @NotNull Updater setInterval(@NotNull String input) {
         interval = Time.parseInterval(input);
+        return this;
+    }
+
+    /**
+     * <p>Sets the interval in which this updater will check for updates</p>
+     *
+     * <p><b>Please note that when using this method, it will automatically convert your
+     * duration object into a usable bukkit interval, so please do not add modifications
+     * of your own.</b></p>
+     *
+     * @param input Provided duration
+     * @return an instance of this updater
+     * @see #setInterval(String)
+     * @see #setInterval(long)
+     * @see #getInterval()
+     */
+    public @NotNull Updater setInterval(@NotNull Duration input) {
+        interval = input.toMillis() / 50;
+        return this;
+    }
+
+    /**
+     * <p>Sets the interval in which this updater will check for updates</p>
+     *
+     * <p><b>Please note that when using this method, it will automatically convert your
+     * duration object into a usable bukkit interval, so please do not add modifications
+     * of your own.</b></p>
+     *
+     * @param input Provided interval
+     * @return an instance of this updater
+     */
+    public @NotNull Updater setInterval(long input) {
+        interval = input / 50;
         return this;
     }
 
