@@ -5,25 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Objects;
-
 public class TestVersion {
-
-    @Test
-    @DisplayName("Validate Version Parsing")
-    public void validateVersionParsing() {
-        Version v1 = new Version("1.0.0-B");
-        Assertions.assertNotNull(v1.getVersion());
-        Assertions.assertNotNull(v1.getModifier());
-        Assertions.assertEquals("1.0.0", v1.getVersion());
-        Assertions.assertEquals("B", v1.getModifier());
-
-        Version v2 = new Version("1.0.0-alpha");
-        Assertions.assertNotNull(v2.getVersion());
-        Assertions.assertNotNull(v2.getModifier());
-        Assertions.assertEquals("1.0.0", v2.getVersion());
-        Assertions.assertEquals("alpha", v2.getModifier().toLowerCase());
-    }
 
     @Test
     @DisplayName("Test Version Comparisons")
@@ -45,19 +27,53 @@ public class TestVersion {
     }
 
     @Test
-    @DisplayName("Ensure modifiers are parsed correctly")
-    public void testModifier() {
+    @DisplayName("Ensure version's broken down correctly")
+    public void testVersionBuilding() {
 
-        Version v1 = new Version("1.0.0-a");
-        Version v2 = new Version("1.0.0-snapshot");
-        Version v3 = new Version("1.0.0");
+        // VERSION 1
+        Version v1 = new Version("1.2.3");
+        Assertions.assertFalse(v1.isUnstable());
+        Assertions.assertEquals(1, v1.getMajor());
+        Assertions.assertEquals(2, v1.getMinor());
+        Assertions.assertEquals(3, v1.getPatch());
+        Assertions.assertEquals(v1.getIdentifier(), Version.Identifier.RELEASE);
 
-        Assertions.assertTrue(v1.isUnstable());
+        // VERSION 2
+        Version v2 = new Version("1.0.0-a");
         Assertions.assertTrue(v2.isUnstable());
-        Assertions.assertFalse(v3.isUnstable());
+        Assertions.assertEquals(1, v2.getMajor());
+        Assertions.assertEquals(0, v2.getMinor());
+        Assertions.assertEquals(0, v2.getPatch());
+        Assertions.assertEquals(v2.getIdentifier(), Version.Identifier.ALPHA);
 
-        Assertions.assertTrue(Objects.requireNonNull(v1.getModifier()).equalsIgnoreCase("a"));
-        Assertions.assertTrue(Objects.requireNonNull(v2.getModifier()).equalsIgnoreCase("snapshot"));
-        Assertions.assertNull(v3.getModifier());
+        // VERSION 3
+        Version v3 = new Version("1.0.0-snapshot");
+        Assertions.assertTrue(v3.isUnstable());
+        Assertions.assertEquals(1, v3.getMajor());
+        Assertions.assertEquals(0, v3.getMinor());
+        Assertions.assertEquals(0, v3.getPatch());
+        Assertions.assertEquals(v3.getIdentifier(), Version.Identifier.SNAPSHOT);
+
+        // VERSION 4
+        Version v4 = new Version("0.9.0rc");
+        Assertions.assertTrue(v4.isUnstable());
+        Assertions.assertEquals(0, v4.getMajor());
+        Assertions.assertEquals(9, v4.getMinor());
+        Assertions.assertEquals(0, v4.getPatch());
+        Assertions.assertEquals(v4.getIdentifier(), Version.Identifier.RELEASE_CANDIDATE);
+
+        Version v5 = new Version("6.0.1b-1.0");
+        Assertions.assertTrue(v5.isUnstable());
+        Assertions.assertEquals(6, v5.getMajor());
+        Assertions.assertEquals(0, v5.getMinor());
+        Assertions.assertEquals(1, v5.getPatch());
+        Assertions.assertEquals(v5.getIdentifier(), Version.Identifier.BETA);
+
+        Version v6 = new Version("6.0.1.4");
+        Assertions.assertFalse(v6.isUnstable());
+        Assertions.assertEquals(6, v6.getMajor());
+        Assertions.assertEquals(0, v6.getMinor());
+        Assertions.assertEquals(1, v6.getPatch());
+        Assertions.assertEquals(v6.getIdentifier(), Version.Identifier.RELEASE);
     }
 }
