@@ -62,6 +62,7 @@ public class TestVersion {
         Assertions.assertEquals(0, v4.getPatch());
         Assertions.assertEquals(v4.getIdentifier(), Version.Identifier.RELEASE_CANDIDATE);
 
+        // VERSION 5
         Version v5 = new Version("6.0.1b-1.0");
         Assertions.assertTrue(v5.isUnstable());
         Assertions.assertEquals(6, v5.getMajor());
@@ -69,6 +70,7 @@ public class TestVersion {
         Assertions.assertEquals(1, v5.getPatch());
         Assertions.assertEquals(v5.getIdentifier(), Version.Identifier.BETA);
 
+        // VERSION 6
         Version v6 = new Version("6.0.1.4");
         Assertions.assertFalse(v6.isUnstable());
         Assertions.assertEquals(6, v6.getMajor());
