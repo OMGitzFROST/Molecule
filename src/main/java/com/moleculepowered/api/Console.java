@@ -1,7 +1,6 @@
 package com.moleculepowered.api;
 
 import com.moleculepowered.api.util.StringUtil;
-import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -192,7 +191,7 @@ public final class Console {
     }
 
     /**
-     * Prints an success message to console.
+     * Prints a success message to console.
      *
      * <p>If {@link #prettyPrint} is set to true, this method will also parse color
      * code, providing a color console output, otherwise this method will simply log the message</p>
@@ -659,7 +658,7 @@ public final class Console {
          * @see #colorize(ConsoleColor, String)
          */
         public static @NotNull String parse(@Nullable String input) {
-            if (!prettyPrint || input == null) return stripColor(input);
+            if (!prettyPrint || input == null) return StringUtil.stripColor(input);
             else input = input.replace('§', '&');
 
             // copy of string
@@ -693,22 +692,10 @@ public final class Console {
          * @see #parse(String)
          */
         public static @NotNull String colorize(@NotNull ConsoleColor color, @Nullable String input) {
-            if (!prettyPrint || input == null) return stripColor(input);
+            if (!prettyPrint || input == null) return StringUtil.stripColor(input);
             else input = input.replace('§', '&');
 
-            return color.getAnsiColor() + stripColor(input) + ConsoleColor.RESET.getAnsiColor();
-        }
-
-        /**
-         * Strips the provided input from all color codes, it normalizes the string by replacing
-         * all "&" color codes with "§" in-order to properly strip them.
-         *
-         * @param input Provided input
-         * @return a colorless string
-         */
-        public static @NotNull String stripColor(@Nullable String input) {
-            input = StringUtil.nonNull(input, "null").replaceAll("&", "§");
-            return ChatColor.stripColor(input);
+            return color.getAnsiColor() + StringUtil.stripColor(input) + ConsoleColor.RESET.getAnsiColor();
         }
 
         /**
