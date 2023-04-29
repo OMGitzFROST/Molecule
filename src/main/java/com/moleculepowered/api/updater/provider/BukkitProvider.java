@@ -19,6 +19,9 @@ import static com.moleculepowered.api.util.StringUtil.format;
 
 public class BukkitProvider extends AbstractProvider {
 
+    private final String TITLE_VALUE = "name";
+    private final String DOWNLOAD_URL = "downloadUrl";
+    private final String FILE_URL = "fileUrl";
     private final String API_KEY;
     private final int resourceID;
     private String downloadLink, changeLogLink, latestVersion;
@@ -43,24 +46,26 @@ public class BukkitProvider extends AbstractProvider {
             HttpURLConnection conn = connection("https://api.curseforge.com/servermods/files?projectIds={0}", resourceID);
 
             // ADD API KEY IF PRESENT
-            if (API_KEY != null && !API_KEY.equals("NONE")) conn.addRequestProperty("X-API-Key", API_KEY);
+            if (API_KEY != null && !API_KEY.isEmpty()) conn.addRequestProperty("X-API-Key", API_KEY);
             conn.connect();
 
             final BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             JsonArray array = new Gson().fromJson(reader, JsonArray.class);
             JsonObject resource = array.get(array.size() - 1).getAsJsonObject();
 
-            latestVersion = resource.get("name").getAsString();
-            downloadLink = resource.get("downloadUrl").getAsString();
+            // GET VERSION INFORMATION
+            latestVersion = resource.get(TITLE_VALUE).getAsString();
+            downloadLink = resource.get(DOWNLOAD_URL).getAsString();
 
-            HttpURLConnection temp = connection("https://dev.bukkit.org/projects/{0}", resourceID);
-            String fileName = StringUtil.substring(temp.getURL().toString(), "/", +1);
-            String fileID = StringUtil.substring(resource.get("fileUrl").getAsString(), "/", +1);
+            HttpURLConnection changeLogConn = connection("https://dev.bukkit.org/projects/{0}", resourceID);
+            String fileName = StringUtil.lastIndex(changeLogConn.getURL().toString(), "/", +1);
+            String fileID = StringUtil.lastIndex(resource.get(FILE_URL).getAsString(), "/", +1);
 
+            // GET UPDATE INFORMATION
             changeLogLink = format("https://www.curseforge.com/minecraft/bukkit-plugins/{0}/files/{1}", fileName, fileID);
 
             // CLOSE CONNECTION
-            temp.disconnect();
+            changeLogConn.disconnect();
             conn.disconnect();
         } catch (IOException ex) {
             throw new ProviderFetchException("The provider failed to fetch the latest update", ex);
