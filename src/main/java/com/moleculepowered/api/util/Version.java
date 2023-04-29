@@ -1,10 +1,14 @@
 package com.moleculepowered.api.util;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * <p>The purpose of this class is to create functional version numbers; it will separate
@@ -18,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public final class Version {
     private String VERSION_PATTERN, MODIFIER_PATTERN;
-    private String version, modifier;
+    private String version, identifier;
     private String[] versionParts = {};
 
     /**
@@ -49,8 +53,8 @@ public final class Version {
             if (versionMatch.find()) version = versionMatch.group();
 
             // SET VERSION TYPE
-            Matcher modifierMatch = parseModifier(input);
-            if (modifierMatch.find()) modifier = modifierMatch.group();
+            Matcher identifierMatch = parseIdentifier(input);
+            if (identifierMatch.find()) identifier = identifierMatch.group();
 
             // SPLIT THE VERSION INTO PARTS
             versionParts = version.split("\\.");
@@ -90,13 +94,13 @@ public final class Version {
     }
 
     /**
-     * A method used to return the version type such as BETA, ALPHA, etc. If no modifier was
-     * found, this method will return "null"
+     * A method used to return the pre-release type such as BETA, ALPHA, etc. If an identifier
+     * was not parsed correctly, this method will return {@link Identifier#RELEASE} by default.
      *
      * @return Version modifier
      */
-    public @Nullable String getModifier() {
-        return modifier;
+    public @NotNull Identifier getIdentifier() {
+        return Identifier.parse(identifier);
     }
 
     /**
@@ -172,8 +176,7 @@ public final class Version {
      * @return true if this version is unstable
      */
     public boolean isUnstable() {
-        String modifier = getModifier() != null ? getModifier().toLowerCase() : null;
-        return modifier != null && (modifier.startsWith("a") || modifier.startsWith("b") || modifier.startsWith("rc") || modifier.startsWith("snap"));
+        return getIdentifier() != Identifier.RELEASE;
     }
 
     /*
@@ -199,7 +202,7 @@ public final class Version {
      * @param input Provided input
      * @return The version modifier or an empty string
      */
-    private @NotNull Matcher parseModifier(String input) {
+    private @NotNull Matcher parseIdentifier(String input) {
         return Pattern.compile(MODIFIER_PATTERN, Pattern.CASE_INSENSITIVE).matcher(input);
     }
 
@@ -238,5 +241,60 @@ public final class Version {
             i++;
         }
         return 0;
+    }
+
+    /**
+     * An enum used to handle all tasks associated with version identifiers, this class
+     * parses, defines and returns an identifier based on a provided input.
+     */
+    public enum Identifier {
+
+        ALPHA("a", "alpha"),
+        BETA("b", "beta"),
+        RELEASE_CANDIDATE("rc"),
+        SNAPSHOT("snapshot"),
+        PRE_RELEASE("pre"),
+        DEVELOPMENTAL("dev"),
+        RELEASE;
+
+        private final String[] identifiers;
+
+        Identifier(String... identifiers) {
+            this.identifiers = identifiers;
+        }
+
+        /**
+         * Used to parse a string into a usable version {@link Identifier}, please note
+         * that if an identifier cannot be derived by the provided input, this
+         * method will return {@link #RELEASE} by default.
+         *
+         * @param input Provided input
+         * @return An identifier or {@link #RELEASE} by default.
+         */
+        public static Identifier parse(@Nullable String input) {
+            return Arrays.stream(Identifier.values())
+                    .filter(identifier -> input != null && identifier.getIdentifiers().contains(input.toLowerCase()))
+                    .findFirst()
+                    .orElse(Identifier.RELEASE);
+        }
+
+        /**
+         * A utility method that returns all identifiers associated with this constant.
+         *
+         * @return A list of identifiers
+         */
+        public Set<String> getIdentifiers() {
+            return Arrays.stream(identifiers).collect(Collectors.toSet());
+        }
+
+        /**
+         * Used to return the name associated with this identifier
+         *
+         * @return Identifier name
+         */
+        @Contract(pure = true)
+        public @NotNull String getName() {
+            return name();
+        }
     }
 }
