@@ -123,7 +123,7 @@ public class GithubProvider extends AbstractProvider {
      */
     @Override
     public @Nullable String getDonationLink() {
-        return null;
+        throw new IllegalArgumentException("This operation is not supported by this provider");
     }
 
     /**
@@ -143,7 +143,7 @@ public class GithubProvider extends AbstractProvider {
      */
     @Override
     public @Nullable String getPrice() {
-        return null;
+        throw new IllegalArgumentException("This operation is not supported by this provider");
     }
 
     /**
@@ -173,6 +173,6 @@ public class GithubProvider extends AbstractProvider {
      */
     @Override
     public boolean isPremium() {
-        return false;
+        throw new IllegalArgumentException("This operation is not supported by this provider");
     }
 }

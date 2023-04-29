@@ -117,7 +117,7 @@ public class PolymartProvider extends AbstractProvider {
      */
     @Override
     public String getDonationLink() {
-        return null;
+        throw new IllegalArgumentException("This operation is not supported by this provider");
     }
 
     /**
