@@ -53,12 +53,14 @@ public final class StringUtil {
     }
 
     /**
-     * Returns a string that has all color codes removed from its content.
+     * Strips the provided input from all color codes, it normalizes the string by replacing
+     * all "&" color codes with "§" in-order to properly strip them.
      *
      * @param input Provided input
-     * @return A colorless string
+     * @return a colorless string
      */
-    public static String stripColor(String input) {
+    public static @NotNull String stripColor(@Nullable String input) {
+        input = StringUtil.nonNull(input, "null").replace('&', ChatColor.COLOR_CHAR);
         return ChatColor.stripColor(input);
     }
 
@@ -118,13 +120,13 @@ public final class StringUtil {
     /**
      * Returns the substring from the last instance of the str.
      *
-     * @param input Provided input
-     * @param str Substring reference
+     * @param input  Provided input
+     * @param str    Substring reference
      * @param offset Offset for substring
      * @return a substring derived from the main input.
-     * @see #substring(String, String)
+     * @see #lastIndex(String, String)
      */
-    public static @NotNull String substring(@NotNull String input, String str, int offset) {
+    public static @NotNull String lastIndex(@NotNull String input, String str, int offset) {
         int index = input.lastIndexOf(str) + offset;
         return input.substring(index);
     }
@@ -133,11 +135,70 @@ public final class StringUtil {
      * Returns the substring from the last instance of the str.
      *
      * @param input Provided input
-     * @param str Substring reference
+     * @param str   Substring reference
      * @return a substring derived from the main input.
-     * @see #substring(String, String, int)
+     * @see #lastIndex(String, String, int)
+     */
+    public static @NotNull String lastIndex(@NotNull String input, String str) {
+        return lastIndex(input, str, 0);
+    }
+
+    /**
+     * Returns the substring from the last instance of the str.
+     *
+     * @param input  Provided input
+     * @param str    Substring reference
+     * @param offset Offset for substring
+     * @return a substring derived from the main input.
+     * @see #lastIndex(String, String)
+     */
+    public static @NotNull String substring(@NotNull String input, String str, int offset) {
+        int index = input.indexOf(str) + offset;
+        return input.substring(index);
+    }
+
+    /**
+     * Returns the substring from the last instance of the str.
+     *
+     * @param input Provided input
+     * @param str   Substring reference
+     * @return a substring derived from the main input.
+     * @see #lastIndex(String, String, int)
      */
     public static @NotNull String substring(@NotNull String input, String str) {
         return substring(input, str, 0);
+    }
+
+    /*
+    REPEAT METHODS
+     */
+
+    /**
+     * Builds a string with the string repeated up to the defined quantity
+     *
+     * @param s        Desired string
+     * @param quantity Desired number of repeats
+     * @return A new string with the character repeated
+     */
+    public static @NotNull String repeat(String s, int quantity) {
+        int currentIndex = 0;
+        StringBuilder builder = new StringBuilder();
+
+        while (currentIndex < quantity) {
+            builder.append(s);
+            currentIndex++;
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Builds a string with the character repeated up to the defined quantity
+     *
+     * @param s        Desired string
+     * @param quantity Desired number of repeats
+     * @return A new string with the character repeated
+     */
+    public static @NotNull String repeat(char s, int quantity) {
+        return repeat(String.valueOf(s), quantity);
     }
 }
