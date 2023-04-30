@@ -21,10 +21,6 @@ public enum UpdateResult {
      */
     LATEST,
     /**
-     * Indicates that the result for the update check was unknown
-     */
-    UNKNOWN,
-    /**
      * Indicates that the updater has determined that a newer version of this
      * plugin, but the updater is unable to download it using the download link
      * provided.
