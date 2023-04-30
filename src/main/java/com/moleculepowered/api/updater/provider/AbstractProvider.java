@@ -14,8 +14,6 @@ import static com.moleculepowered.api.util.StringUtil.format;
 
 public abstract class AbstractProvider {
 
-    private int responseCode;
-
     /**
      * A shorthand method for creating usable https connections, please note that this method
      * opens the connection for you beforehand, it's your job though to disconnect it once you no
@@ -34,8 +32,6 @@ public abstract class AbstractProvider {
         conn.setReadTimeout(30000);
         conn.setDoOutput(true);
         conn.connect();
-
-        responseCode = conn.getResponseCode();
         return conn;
     }
 
@@ -105,16 +101,6 @@ public abstract class AbstractProvider {
      * @return Total downloads
      */
     public abstract int getDownloads();
-
-    /**
-     * Used to return the response code returned by the last {@link #connection(String, Object...)} method used.
-     * If this method was not used, this method will return as 0.
-     *
-     * @return the last known response code
-     */
-    public int getResponseCode() {
-        return responseCode;
-    }
 
     /**
      * Return's true if the latest release is a premium resource
