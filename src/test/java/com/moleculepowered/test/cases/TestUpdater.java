@@ -7,19 +7,19 @@ import com.moleculepowered.api.updater.provider.GithubProvider;
 import com.moleculepowered.api.updater.provider.PolymartProvider;
 import com.moleculepowered.api.updater.provider.SpigetProvider;
 import com.moleculepowered.api.updater.provider.SpigotProvider;
-import com.moleculepowered.test.AbstractTest;
+import com.moleculepowered.test.AbstractCase;
 import org.apache.commons.lang.Validate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class TestUpdater extends AbstractTest {
+public class TestUpdater extends AbstractCase {
 
     @Test
     @DisplayName("Test updater and all our default providers")
     public void testUpdater() {
 
         // SETS ALL PROVIDER
-        Updater updater = new Updater(plugin)
+        Updater updater = new Updater(getPlugin())
                 .addProvider(new GithubProvider("EssentialsX/Essentials"))
                 .addProvider(new SpigetProvider(9089))
                 .addProvider(new SpigotProvider(1234))

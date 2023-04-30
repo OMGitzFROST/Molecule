@@ -1,15 +1,16 @@
 package com.moleculepowered.test.cases;
 
 import com.moleculepowered.api.util.Version;
+import com.moleculepowered.test.AbstractCase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class TestVersion {
+public class TestVersion extends AbstractCase {
 
     @Test
     @DisplayName("Test Version Comparisons")
-    public void versionComparing() {
+    public void testVersionComparing() {
         // GREATER THAN
         Version greater1 = new Version("1.2.0");
         Version greater2 = new Version("1.0.0");
