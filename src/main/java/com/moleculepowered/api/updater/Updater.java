@@ -5,18 +5,19 @@ import com.moleculepowered.api.MoleculeAPI;
 import com.moleculepowered.api.event.updater.UpdateCompleteEvent;
 import com.moleculepowered.api.updater.provider.AbstractProvider;
 import com.moleculepowered.api.util.FileUtil;
+import com.moleculepowered.api.util.StringUtil;
 import com.moleculepowered.api.util.Time;
 import com.moleculepowered.api.util.Version;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,12 +51,12 @@ import static com.moleculepowered.api.util.StringUtil.format;
 public final class Updater {
 
     private final List<AbstractProvider> providers = new ArrayList<>();
-    private UpdateResult result = UpdateResult.UNKNOWN;
-    private AbstractProvider activeProvider;
+    private UpdateResult result = UpdateResult.LATEST;
+    private static AbstractProvider activeProvider;
     private Listener listener;
     private String permission;
     private File dataFolder;
-    private Plugin plugin;
+    private static Plugin plugin;
     private boolean globalEnabled, attemptDownload;
     private boolean enabled, betaEnabled;
     private long interval;
@@ -79,7 +80,7 @@ public final class Updater {
      */
     public Updater(@NotNull Plugin plugin) {
         MoleculeAPI.setPlugin(plugin);
-        this.plugin = plugin;
+        Updater.plugin = plugin;
         interval = Time.parseInterval("3h");
         enabled = true;
         permission = "";
@@ -107,19 +108,15 @@ public final class Updater {
      * @see #scheduleAsync()
      */
     public void schedule() {
-        // THROW ERRORS FOR INVALID ESSENTIAL SETTINGS
-        Validate.isTrue(interval > 0L, "The interval must be greater than 0 for this updater");
-        Validate.isTrue(!providers.isEmpty(), "Please supply at least one provider for your updater");
-
         // FIRST, VERIFY THAT ALL REQUIREMENTS ARE MET BEFORE SCHEDULING
         if (!globalEnabled || !enabled) {
-            Console.info("Updater disabled, there we will not check for updates.");
             result = UpdateResult.DISABLED;
             return;
         }
 
-        // INITIALIZE TASK TIMER
-        plugin.getServer().getPluginManager().registerEvents(listener != null ? listener : new UpdateEventHandler(), plugin);
+        // INITIALIZE TASK TIMER AND REGISTER LISTENERS
+        plugin.getServer().getPluginManager().registerEvents(listener != null ? listener : new MessageHandler(this), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new AudienceListener(this), plugin);
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> initialize(), 0, interval);
     }
 
@@ -131,18 +128,13 @@ public final class Updater {
      * @see #schedule()
      */
     public void scheduleAsync() {
-        // THROW ERRORS FOR INVALID ESSENTIAL SETTINGS
-        Validate.isTrue(interval > 0L, "The interval must be greater than 0 for this updater");
-        Validate.isTrue(!providers.isEmpty(), "Please supply at least one provider for your updater");
-
         // FIRST, VERIFY THAT ALL REQUIREMENTS ARE MET BEFORE SCHEDULING
         if (!globalEnabled || !enabled) {
-            Console.info("Updater disabled, there we will not check for updates.");
             result = UpdateResult.DISABLED;
             return;
         }
 
-        plugin.getServer().getPluginManager().registerEvents(listener != null ? listener : new UpdateEventHandler(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(listener != null ? listener : new MessageHandler(this), plugin);
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> initialize(true), 0, interval);
     }
 
@@ -157,7 +149,7 @@ public final class Updater {
      * @see #initialize()
      */
     private void initialize(boolean async) {
-        notifyAudience("&6Checking for a new update...");
+        Console.log("&6Checking for a new update...");
 
         // CREATE AN INSTANCE OF THE CURRENT PROVIDER
         Version currentVersion = new Version(plugin.getDescription().getVersion());
@@ -245,17 +237,6 @@ public final class Updater {
         if (outputFile.exists()) result = UpdateResult.EXISTS;
     }
 
-    /**
-     * A private method used to send a notification to all audience members and the console
-     *
-     * @param message Provided message
-     * @param param   Optional parameters
-     */
-    private void notifyAudience(String message, Object... param) {
-        Console.info(message, param);
-        getAudience().forEach(player -> player.sendMessage(format(message, param)));
-    }
-
     /*
     CHAIN METHODS
      */
@@ -270,7 +251,6 @@ public final class Updater {
      * @see #getProviders()
      */
     public @NotNull Updater addProvider(@NotNull AbstractProvider provider) {
-        Validate.notEmpty(provider.getName(), "One or more of your update providers is missing a provider name");
         providers.add(provider);
         return this;
     }
@@ -460,7 +440,7 @@ public final class Updater {
      * @see #setPermission(String)
      */
     public @NotNull String getPermission() {
-        return permission;
+        return StringUtil.nonNull(permission, "");
     }
 
     /**
@@ -581,56 +561,55 @@ public final class Updater {
      * has a built-in check that will ensure that this class is only implemented as the
      * primary update handler if the developer did not provide one for us.
      */
-    private class UpdateEventHandler implements Listener {
+    private static class MessageHandler implements Listener {
 
-        private AbstractProvider provider;
+        private final Updater updater;
+        private UpdateResult result;
 
         /*
         EVENT HANDLERS
          */
 
+        public MessageHandler(Updater updater) {
+            this.updater = updater;
+        }
+
         @EventHandler
         public void onUpdateComplete(@NotNull UpdateCompleteEvent event) {
 
-            provider = event.getProvider();
-            String latestVersion = provider.getRelease().getVersion();
+            result = event.getResult();
 
-            // SEND CONSOLE NOTIFICATIONS WHEN THE UPDATER COMPLETES
-            switch (event.getResult()) {
-                case LATEST:
-                    Console.info("No updates were found...");
+            switch (result) {
+                case DOWNLOADED:
+                    sendNotification(DefaultMessage.DOWNLOADED);
                     break;
                 case EXISTS:
-                    Console.info("&e{0} v{1} &ais already downloaded, Please Check your Update folder and install it", plugin.getName(), latestVersion);
-                    break;
-                case DOWNLOADED:
-                    Console.info("&aSuccessfully downloaded (&e{0} v{1}&a), Please install it from you update folder", plugin.getName(), latestVersion);
-                    break;
-                case UPDATE_AVAILABLE:
-                    Console.info(StringUtils.repeat('*', 60));
-                    Console.info("Version ({0}) is now available for {1}.", latestVersion, plugin.getName());
-                    Console.info(provider.getDownloadLink() != null, "Download: {0}", provider.getDownloadLink());
-                    Console.info(provider.getChangelogLink() != null, "Changelog: {0}", provider.getChangelogLink());
-                    Console.info(provider.getDonationLink() != null, "Donate: {0}", provider.getDonationLink());
-                    Console.info(StringUtils.repeat('*', 60));
+                    sendNotification(DefaultMessage.EXISTS);
                     break;
                 case DISABLED:
-                    Console.warning("The auto updater for this plugin is disabled, please enable to receive update notifications");
+                    sendNotification(DefaultMessage.DISABLED);
+                    break;
+                case UPDATE_AVAILABLE:
+                    sendNotification(DefaultMessage.UPDATE_AVAILABLE);
                     break;
                 default:
-                    Console.warning("The updater returned an unknown result, its severity is also undefined");
+                    sendNotification(DefaultMessage.LATEST);
+                    break;
             }
-
-            getAudience().forEach(this::sendPlayerNotification);
         }
 
         @EventHandler
         public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
 
-            // CHECK IF UPDATE IS AVAILABLE AND
-            if (result == UpdateResult.UPDATE_AVAILABLE && getAudience().contains(event.getPlayer())) {
-                sendPlayerNotification(event.getPlayer());
-            }
+            // IF NO UPDATE AVAILABLE, DO NOT DO ANYTHING
+            if (result != UpdateResult.UPDATE_AVAILABLE) return;
+
+            // SEND NOTIFICATION IF PLAYER IS AUDIENCE MEMBER
+            updater.getAudience().forEach(p -> {
+                if (p == event.getPlayer()) {
+                    p.sendMessage(DefaultMessage.getMessages(DefaultMessage.UPDATE_AVAILABLE));
+                }
+            });
         }
 
         /*
@@ -638,33 +617,75 @@ public final class Updater {
          */
 
         /**
-         * Sends a notification to a player determined by the result configured by the updater.
-         *
-         * @param player Target player
+         * Sends a notification determined by the result configured by the updater.
          */
-        private void sendPlayerNotification(@NotNull Player player) {
+        private void sendNotification(@NotNull DefaultMessage message) {
+            Console.info(Arrays.asList(DefaultMessage.getMessages(message)));
+            updater.getAudience().forEach(player -> player.sendMessage(DefaultMessage.getMessages(message)));
+        }
+    }
 
-            // SEND PLAYER NOTIFICATIONS WHEN THE UPDATER COMPLETES
-            switch (result) {
-                case LATEST:
-                    player.sendMessage("You have the latest version of this plugin");
-                    break;
-                case EXISTS:
-                    player.sendMessage(format("&6The latest version of {0} is already downloaded, please check the update's folder", plugin.getName()));
-                    break;
-                case DOWNLOADED:
-                    player.sendMessage(format("&aSuccessfully downloaded (&e{0} v{1}&a), Please install it from you update folder", plugin.getName(), provider.getRelease().getFullVersion()));
-                    break;
-                case UPDATE_AVAILABLE:
-                    player.sendMessage(format("&3Version (&f{0}&3) is now available for &6{1}&3.", provider.getRelease().getVersion(), plugin.getName()));
-                    player.sendMessage(format("&3Please refer to the console for more information."));
-                    break;
-                case DISABLED:
-                    player.sendMessage("The auto updater for this plugin is disabled, please enable to receive update notifications");
-                    break;
-                default:
-                    player.sendMessage("The updater returned an unknown result, its severity is also undefined");
-            }
+    /**
+     * Used to add and remove players from the audience
+     */
+    private static class AudienceListener implements Listener {
+
+        private final Updater updater;
+
+        public AudienceListener(Updater updater) {
+            this.updater = updater;
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST)
+        public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
+            if (event.getPlayer().hasPermission(updater.getPermission())) updater.getAudience().add(event.getPlayer());
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST)
+        public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
+            if (event.getPlayer().hasPermission(updater.getPermission()))
+                updater.getAudience().remove(event.getPlayer());
+        }
+    }
+
+    /**
+     * The enum used to provide us will all default messages associated with each update result
+     */
+    private enum DefaultMessage {
+        DISABLED,
+        DOWNLOADED(format("&aSuccessfully downloaded (&e{0} v{1}&a), Please install it from your update folder", plugin.getName(), activeProvider.getRelease().getVersion())),
+        EXISTS(format("&e{0} v{1} &ais already downloaded, Please Check your Update folder and install it", plugin.getName(), activeProvider.getRelease().getVersion())),
+        LATEST(format("&6No updates were found...")),
+        UPDATE_AVAILABLE(
+                format("&3{0}", StringUtil.repeat('*', 60)),
+                format("&eVersion (&f&l{0}&e) is now available for &f&l{1}&e.", activeProvider.getRelease().getVersion(), plugin.getName()),
+                format("&a&lDownload &7| &a&lChangelog", activeProvider.getDownloadLink()),
+                format("&3{0}", StringUtil.repeat('*', 60))
+        );
+
+        private final String[] messages;
+
+        DefaultMessage(String... messages) {
+            this.messages = messages;
+        }
+
+        /**
+         * Used to return all message string assigned to the provided default message constant
+         *
+         * @param message Provided constant
+         * @return All messages assigned to provided constant
+         */
+        public static @NotNull String[] getMessages(@NotNull DefaultMessage message) {
+            return message.messages;
+        }
+
+        /**
+         * Returns all messages assigned to this constant as an array
+         *
+         * @return A messages assigned
+         */
+        public @NotNull String[] getMessages() {
+            return messages;
         }
     }
 }
