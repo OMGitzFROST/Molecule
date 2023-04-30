@@ -638,13 +638,14 @@ public final class Updater {
 
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
-            if (event.getPlayer().hasPermission(updater.getPermission())) updater.getAudience().add(event.getPlayer());
+            Player player = event.getPlayer();
+            if (player.hasPermission(updater.getPermission())) updater.getAudience().add(player);
         }
 
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
-            if (event.getPlayer().hasPermission(updater.getPermission()))
-                updater.getAudience().remove(event.getPlayer());
+            Player player = event.getPlayer();
+            if (player.hasPermission(updater.getPermission())) updater.getAudience().remove(player);
         }
     }
 
