@@ -148,7 +148,7 @@ public final class Updater {
      * @see #scheduleAsync()
      * @see #initialize()
      */
-    private void initialize(boolean async) {
+    public void initialize(boolean async) {
         Console.log("&6Checking for a new update...");
 
         // CREATE AN INSTANCE OF THE CURRENT PROVIDER
