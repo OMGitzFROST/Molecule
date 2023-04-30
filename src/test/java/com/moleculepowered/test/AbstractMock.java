@@ -6,7 +6,7 @@ import com.moleculepowered.api.TestPlugin;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 
-public abstract class AbstractCase {
+public abstract class AbstractMock {
 
     private static final ServerMock server;
     private static final TestPlugin plugin;

@@ -1,12 +1,12 @@
-package com.moleculepowered.test.cases;
+package com.moleculepowered.test.mocks;
 
 import com.moleculepowered.api.util.Version;
-import com.moleculepowered.test.AbstractCase;
+import com.moleculepowered.test.AbstractMock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class TestVersion extends AbstractCase {
+public class MockVersion extends AbstractMock {
 
     @Test
     @DisplayName("Test Version Comparisons")

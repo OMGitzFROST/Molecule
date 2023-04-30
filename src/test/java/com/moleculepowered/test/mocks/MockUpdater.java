@@ -1,4 +1,4 @@
-package com.moleculepowered.test.cases;
+package com.moleculepowered.test.mocks;
 
 import com.moleculepowered.api.updater.Updater;
 import com.moleculepowered.api.updater.provider.AbstractProvider;
@@ -7,12 +7,12 @@ import com.moleculepowered.api.updater.provider.GithubProvider;
 import com.moleculepowered.api.updater.provider.PolymartProvider;
 import com.moleculepowered.api.updater.provider.SpigetProvider;
 import com.moleculepowered.api.updater.provider.SpigotProvider;
-import com.moleculepowered.test.AbstractCase;
+import com.moleculepowered.test.AbstractMock;
 import org.apache.commons.lang.Validate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class TestUpdater extends AbstractCase {
+public class MockUpdater extends AbstractMock {
 
     @Test
     @DisplayName("Test updater and all our default providers")
