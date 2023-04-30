@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-public class FileUtil {
+public final class FileUtil {
 
     /**
      * Used to return the file name from a string input and will include its file extension
