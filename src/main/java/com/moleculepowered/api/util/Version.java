@@ -44,7 +44,7 @@ public final class Version {
      */
     public Version(@Nullable String input) {
         VERSION_PATTERN = "(?:(\\d+)\\.)?(?:(\\d+)\\.)?(\\*|\\d+)";
-        MODIFIER_PATTERN = "B(ETA)?|A(LPHA)?|RC|SNAPSHOT";
+        MODIFIER_PATTERN = "BETA|ALPHA|RC|SNAPSHOT";
 
         if (input != null) {
 
