@@ -1,6 +1,5 @@
 package com.moleculepowered.api.updater;
 
-import com.moleculepowered.api.Console;
 import com.moleculepowered.api.MoleculeAPI;
 import com.moleculepowered.api.TestPlugin;
 import com.moleculepowered.api.event.updater.UpdateCompleteEvent;
@@ -17,6 +16,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -57,18 +57,28 @@ import static com.moleculepowered.api.util.StringUtil.format;
  */
 public final class Updater {
 
+    // The list of providers used for update checking
     private final List<AbstractProvider> providers = new ArrayList<>();
-    private UpdateResult result = UpdateResult.LATEST;
+    // The provider containing the latest update
     private static AbstractProvider activeProvider;
-    private Listener listener;
-    private String permission;
-    private File dataFolder;
+    // The plugin running this updater
     private static TestPlugin plugin;
-    private boolean globalEnabled, attemptDownload;
-    private boolean enabled, betaEnabled;
-    private long interval;
-
+    // The component that contains clickable links (sent to audience)
     private static TextComponent linkBar;
+    // The result returned by the updater
+    private UpdateResult result = UpdateResult.LATEST;
+    // The listener used to send update messages
+    private Listener listener;
+    // The permission required by the audience to receive notifications
+    private String permission;
+    // The parent directory for the update configuration
+    private File dataFolder;
+    // Global settings set by the update configuration
+    private boolean globalEnabled, attemptDownload, soundEnabled;
+    // Local settings set using the updater chain
+    private boolean enabled, betaEnabled;
+    // The interval in which this updater will check for updates
+    private long interval;
 
     /*
     CONSTRUCTOR
@@ -103,6 +113,7 @@ public final class Updater {
         FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         globalEnabled = config.getBoolean("enabled");
         attemptDownload = config.getBoolean("attempt-downloads");
+        soundEnabled = config.getBoolean("play-sound");
     }
 
     /*
@@ -158,7 +169,6 @@ public final class Updater {
      * @see #initialize()
      */
     public void initialize(boolean async) {
-        Console.log("&6Checking for a new update...");
 
         // CREATE AN INSTANCE OF THE CURRENT PROVIDER
         Version currentVersion = new Version(plugin.getDescription().getVersion());
@@ -188,10 +198,11 @@ public final class Updater {
         // IF FETCHED VERSION IS GREATER THAN CURRENT, SET RESULT ONCE
         if (activeProvider.getRelease().isGreaterThan(currentVersion)) result = UpdateResult.UPDATE_AVAILABLE;
 
-        BaseComponent downloadButton = null, changeLogButton = null, donateButton = null;
+        BaseComponent downloadButton = null, changeLogButton = null;
 
         // DOWNLOAD UPDATE (IF POSSIBLE)
         try {
+            // ATTEMPT DOWNLOAD AND CREATE DOWNLOAD BUTTON
             if (activeProvider.getDownloadLink() != null) {
                 File outputFile = new File(dataFolder, FileUtil.getFileName(activeProvider.getDownloadLink()));
                 attemptDownload(activeProvider.getDownloadLink(), outputFile);
@@ -202,6 +213,7 @@ public final class Updater {
                 downloadButton.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, activeProvider.getDownloadLink()));
             }
 
+            // CREATE CHANGELOG BUTTON
             if (activeProvider.getChangelogLink() != null) {
                 changeLogButton = new TextComponent(" | Changelog");
                 changeLogButton.setColor(ChatColor.GREEN);
@@ -209,14 +221,7 @@ public final class Updater {
                 changeLogButton.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, activeProvider.getChangelogLink()));
             }
 
-            if (activeProvider.getDonationLink() != null) {
-                donateButton = new TextComponent(" | Donate");
-                donateButton.setColor(ChatColor.GREEN);
-                donateButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click here to donate")));
-                donateButton.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, activeProvider.getDonationLink()));
-            }
-
-            linkBar = new TextComponent(downloadButton != null ? downloadButton : new TextComponent(), changeLogButton != null ? changeLogButton : new TextComponent(), donateButton != null ? donateButton : new TextComponent());
+            linkBar = new TextComponent(new TextComponent(downloadButton != null ? downloadButton : new TextComponent()), new TextComponent(changeLogButton != null ? changeLogButton : new TextComponent()));
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -585,6 +590,28 @@ public final class Updater {
         return player != null && (player.getPlayer() != null && getAudience().contains(player.getPlayer()));
     }
 
+    /**
+     * Sends a notification determined by the result configured by the updater.
+     */
+    private void sendNotification(@NotNull AudienceType type, @NotNull DefaultMessage message) {
+
+        switch (type) {
+            case CONSOLE:
+                Arrays.stream(message.getMessages()).forEach(m -> Bukkit.getConsoleSender().spigot().sendMessage(m));
+                break;
+            case PLAYER:
+                getAudience().forEach(player -> {
+                    if (soundEnabled)
+                        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 50, 50);
+                    Arrays.stream(DefaultMessage.getMessages(message)).forEach(m -> player.spigot().sendMessage(m));
+                });
+                break;
+            default:
+                sendNotification(AudienceType.CONSOLE, message);
+                sendNotification(AudienceType.PLAYER, message);
+        }
+    }
+
     /*
     INTERNAL CLASSES
      */
@@ -616,19 +643,20 @@ public final class Updater {
 
             switch (result) {
                 case DOWNLOADED:
-                    sendNotification(DefaultMessage.DOWNLOADED);
+                    updater.sendNotification(AudienceType.ALL, DefaultMessage.DOWNLOADED);
                     break;
                 case EXISTS:
-                    sendNotification(DefaultMessage.EXISTS);
+                    updater.sendNotification(AudienceType.ALL, DefaultMessage.EXISTS);
                     break;
                 case DISABLED:
-                    sendNotification(DefaultMessage.DISABLED);
+                    updater.sendNotification(AudienceType.ALL, DefaultMessage.DISABLED);
                     break;
                 case UPDATE_AVAILABLE:
-                    sendNotification(DefaultMessage.UPDATE_AVAILABLE);
+                    updater.sendNotification(AudienceType.CONSOLE, DefaultMessage.UPDATE_AVAILABLE_CONSOLE);
+                    updater.sendNotification(AudienceType.PLAYER, DefaultMessage.UPDATE_AVAILABLE);
                     break;
                 default:
-                    sendNotification(DefaultMessage.LATEST);
+                    updater.sendNotification(AudienceType.ALL, DefaultMessage.LATEST);
                     break;
             }
         }
@@ -640,26 +668,20 @@ public final class Updater {
             if (result != UpdateResult.UPDATE_AVAILABLE) return;
 
             // SEND NOTIFICATION IF PLAYER IS AUDIENCE MEMBER
-            updater.getAudience().forEach(p -> Arrays.stream(DefaultMessage.getMessages(DefaultMessage.UPDATE_AVAILABLE)).forEach(m -> {
-                p.spigot().sendMessage(m);
-            }));
+            updater.sendNotification(AudienceType.PLAYER, DefaultMessage.UPDATE_AVAILABLE);
         }
+    }
 
-        /*
-        NOTIFICATION METHODS
-         */
-
-        /**
-         * Sends a notification determined by the result configured by the updater.
-         */
-        private void sendNotification(@NotNull DefaultMessage message) {
-
-            Arrays.stream(message.getMessages()).forEach(m -> {
-                Bukkit.getConsoleSender().spigot().sendMessage(m);
-            });
-
-            updater.getAudience().forEach(player -> Arrays.stream(DefaultMessage.getMessages(message)).forEach(m -> player.spigot().sendMessage(m)));
-        }
+    /**
+     * Primarily used to define the type of audience the {@link #sendNotification(AudienceType, DefaultMessage)}
+     * method should send a message to.
+     *
+     * @author OMGitzFROST
+     */
+    private enum AudienceType {
+        CONSOLE,
+        PLAYER,
+        ALL
     }
 
     /**
@@ -699,15 +721,22 @@ public final class Updater {
         EXISTS(format("&e{0} v{1} &ais already downloaded, Please Check your Update folder and install it", plugin.getName(), activeProvider.getRelease().getVersion())),
         LATEST(format("&6No updates were found...")),
         UPDATE_AVAILABLE(
-//                new TextComponent(ChatColor.translateAlternateColorCodes('&', "&b" + StringUtil.repeat('*', 60))),
-                new TextComponent(format("&6Version (&f&l{0}&6) is now available for &f&l{1}&6.", activeProvider.getRelease().getVersion(), plugin.getName())),
-                linkBar
-//                new TextComponent(ChatColor.translateAlternateColorCodes('&', "&b" + StringUtil.repeat('*', 60)))
+                new TextComponent(format("&6Version (&f{0}&6) is now available for &f{1}&6.", activeProvider.getRelease().getVersion(), plugin.getName())),
+                linkBar,
+                new TextComponent(StringUtil.repeat('-', 10))
+        ),
+        UPDATE_AVAILABLE_CONSOLE(
+                StringUtil.repeat('*', 60),
+                format("&6Version (&4&l{0}&6) is now available for &4&l{1}&6.", activeProvider.getRelease().getVersion(), plugin.getName()),
+                activeProvider.getDownloadLink() != null ? "&aDownload: &r" + activeProvider.getDownloadLink() : "",
+                activeProvider.getChangelogLink() != null ? "&aChangelog: &r" + activeProvider.getChangelogLink() : "",
+                StringUtil.repeat('*', 60)
         );
 
         private BaseComponent[] messages;
 
         DefaultMessage(String... messages) {
+            messages = Arrays.stream(messages).map(s -> ChatColor.translateAlternateColorCodes(ChatColor.COLOR_CHAR, s.replace('&', ChatColor.COLOR_CHAR))).toArray(String[]::new);
             this.messages = Arrays.stream(messages).map(TextComponent::new).toArray(BaseComponent[]::new);
         }
 
