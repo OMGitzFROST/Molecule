@@ -12,7 +12,7 @@ import org.apache.commons.lang.Validate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class MockUpdater extends AbstractMock {
+public class TestUpdater extends AbstractMock {
 
     @Test
     @DisplayName("Test updater and all our default providers")

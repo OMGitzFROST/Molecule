@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class MockVersion extends AbstractMock {
+public class TestVersion extends AbstractMock {
 
     @Test
     @DisplayName("Test Version Comparisons")
