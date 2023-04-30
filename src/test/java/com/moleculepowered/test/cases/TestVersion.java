@@ -1,12 +1,11 @@
 package com.moleculepowered.test.cases;
 
 import com.moleculepowered.api.util.Version;
-import com.moleculepowered.test.AbstractTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class TestVersion extends AbstractTest {
+public class TestVersion {
 
     @Test
     @DisplayName("Test Version Comparisons")
@@ -40,7 +39,7 @@ public class TestVersion extends AbstractTest {
         Assertions.assertEquals(v1.getIdentifier(), Version.Identifier.RELEASE);
 
         // VERSION 2
-        Version v2 = new Version("1.0.0-a");
+        Version v2 = new Version("1.0.0-alpha");
         Assertions.assertTrue(v2.isUnstable());
         Assertions.assertEquals(1, v2.getMajor());
         Assertions.assertEquals(0, v2.getMinor());
@@ -64,7 +63,7 @@ public class TestVersion extends AbstractTest {
         Assertions.assertEquals(v4.getIdentifier(), Version.Identifier.RELEASE_CANDIDATE);
 
         // VERSION 5
-        Version v5 = new Version("6.0.1b-1.0");
+        Version v5 = new Version("6.0.1beta-1.0");
         Assertions.assertTrue(v5.isUnstable());
         Assertions.assertEquals(6, v5.getMajor());
         Assertions.assertEquals(0, v5.getMinor());
@@ -78,5 +77,12 @@ public class TestVersion extends AbstractTest {
         Assertions.assertEquals(0, v6.getMinor());
         Assertions.assertEquals(1, v6.getPatch());
         Assertions.assertEquals(v6.getIdentifier(), Version.Identifier.RELEASE);
+
+        Version v7 = new Version("9.8.7-whatever+meta+meta");
+        Assertions.assertFalse(v7.isUnstable());
+        Assertions.assertEquals(9, v7.getMajor());
+        Assertions.assertEquals(8, v7.getMinor());
+        Assertions.assertEquals(7, v7.getPatch());
+        Assertions.assertEquals(v7.getIdentifier(), Version.Identifier.RELEASE);
     }
 }
