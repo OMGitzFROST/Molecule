@@ -2,12 +2,19 @@ package com.moleculepowered.api.updater;
 
 import com.moleculepowered.api.Console;
 import com.moleculepowered.api.MoleculeAPI;
+import com.moleculepowered.api.TestPlugin;
 import com.moleculepowered.api.event.updater.UpdateCompleteEvent;
 import com.moleculepowered.api.updater.provider.AbstractProvider;
 import com.moleculepowered.api.util.FileUtil;
 import com.moleculepowered.api.util.StringUtil;
 import com.moleculepowered.api.util.Time;
 import com.moleculepowered.api.util.Version;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -56,10 +63,12 @@ public final class Updater {
     private Listener listener;
     private String permission;
     private File dataFolder;
-    private static Plugin plugin;
+    private static TestPlugin plugin;
     private boolean globalEnabled, attemptDownload;
     private boolean enabled, betaEnabled;
     private long interval;
+
+    private static TextComponent linkBar;
 
     /*
     CONSTRUCTOR
@@ -80,7 +89,7 @@ public final class Updater {
      */
     public Updater(@NotNull Plugin plugin) {
         MoleculeAPI.setPlugin(plugin);
-        Updater.plugin = plugin;
+        Updater.plugin = (TestPlugin) plugin;
         interval = Time.parseInterval("3h");
         enabled = true;
         permission = "";
@@ -179,12 +188,36 @@ public final class Updater {
         // IF FETCHED VERSION IS GREATER THAN CURRENT, SET RESULT ONCE
         if (activeProvider.getRelease().isGreaterThan(currentVersion)) result = UpdateResult.UPDATE_AVAILABLE;
 
+        BaseComponent downloadButton = null, changeLogButton = null, donateButton = null;
+
         // DOWNLOAD UPDATE (IF POSSIBLE)
         try {
             if (activeProvider.getDownloadLink() != null) {
                 File outputFile = new File(dataFolder, FileUtil.getFileName(activeProvider.getDownloadLink()));
                 attemptDownload(activeProvider.getDownloadLink(), outputFile);
+
+                downloadButton = new TextComponent("Download");
+                downloadButton.setColor(ChatColor.GREEN);
+                downloadButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click here to download")));
+                downloadButton.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, activeProvider.getDownloadLink()));
             }
+
+            if (activeProvider.getChangelogLink() != null) {
+                changeLogButton = new TextComponent(" | Changelog");
+                changeLogButton.setColor(ChatColor.GREEN);
+                changeLogButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click here to view changelog")));
+                changeLogButton.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, activeProvider.getChangelogLink()));
+            }
+
+            if (activeProvider.getDonationLink() != null) {
+                donateButton = new TextComponent(" | Donate");
+                donateButton.setColor(ChatColor.GREEN);
+                donateButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click here to donate")));
+                donateButton.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, activeProvider.getDonationLink()));
+            }
+
+            linkBar = new TextComponent(downloadButton != null ? downloadButton : new TextComponent(), changeLogButton != null ? changeLogButton : new TextComponent(), donateButton != null ? donateButton : new TextComponent());
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -553,13 +586,15 @@ public final class Updater {
     }
 
     /*
-    EVENT HANDLER CLASS
+    INTERNAL CLASSES
      */
 
     /**
      * The default class that will be used to handle our default update notifications. This updater
      * has a built-in check that will ensure that this class is only implemented as the
      * primary update handler if the developer did not provide one for us.
+     *
+     * @author OMGitzFROST
      */
     private static class MessageHandler implements Listener {
 
@@ -605,11 +640,9 @@ public final class Updater {
             if (result != UpdateResult.UPDATE_AVAILABLE) return;
 
             // SEND NOTIFICATION IF PLAYER IS AUDIENCE MEMBER
-            updater.getAudience().forEach(p -> {
-                if (p == event.getPlayer()) {
-                    p.sendMessage(DefaultMessage.getMessages(DefaultMessage.UPDATE_AVAILABLE));
-                }
-            });
+            updater.getAudience().forEach(p -> Arrays.stream(DefaultMessage.getMessages(DefaultMessage.UPDATE_AVAILABLE)).forEach(m -> {
+                p.spigot().sendMessage(m);
+            }));
         }
 
         /*
@@ -620,13 +653,19 @@ public final class Updater {
          * Sends a notification determined by the result configured by the updater.
          */
         private void sendNotification(@NotNull DefaultMessage message) {
-            Console.info(Arrays.asList(DefaultMessage.getMessages(message)));
-            updater.getAudience().forEach(player -> player.sendMessage(DefaultMessage.getMessages(message)));
+
+            Arrays.stream(message.getMessages()).forEach(m -> {
+                Bukkit.getConsoleSender().spigot().sendMessage(m);
+            });
+
+            updater.getAudience().forEach(player -> Arrays.stream(DefaultMessage.getMessages(message)).forEach(m -> player.spigot().sendMessage(m)));
         }
     }
 
     /**
      * Used to add and remove players from the audience
+     *
+     * @author OMGitzFROST
      */
     private static class AudienceListener implements Listener {
 
@@ -651,6 +690,8 @@ public final class Updater {
 
     /**
      * The enum used to provide us will all default messages associated with each update result
+     *
+     * @author OMGitzFROST
      */
     private enum DefaultMessage {
         DISABLED,
@@ -658,16 +699,23 @@ public final class Updater {
         EXISTS(format("&e{0} v{1} &ais already downloaded, Please Check your Update folder and install it", plugin.getName(), activeProvider.getRelease().getVersion())),
         LATEST(format("&6No updates were found...")),
         UPDATE_AVAILABLE(
-                format("&3{0}", StringUtil.repeat('*', 60)),
-                format("&eVersion (&f&l{0}&e) is now available for &f&l{1}&e.", activeProvider.getRelease().getVersion(), plugin.getName()),
-                format("&a&lDownload &7| &a&lChangelog", activeProvider.getDownloadLink()),
-                format("&3{0}", StringUtil.repeat('*', 60))
+//                new TextComponent(ChatColor.translateAlternateColorCodes('&', "&b" + StringUtil.repeat('*', 60))),
+                new TextComponent(format("&6Version (&f&l{0}&6) is now available for &f&l{1}&6.", activeProvider.getRelease().getVersion(), plugin.getName())),
+                linkBar
+//                new TextComponent(ChatColor.translateAlternateColorCodes('&', "&b" + StringUtil.repeat('*', 60)))
         );
 
-        private final String[] messages;
+        private BaseComponent[] messages;
 
         DefaultMessage(String... messages) {
-            this.messages = messages;
+            this.messages = Arrays.stream(messages).map(TextComponent::new).toArray(BaseComponent[]::new);
+        }
+
+        DefaultMessage(BaseComponent... component) {
+            this.messages = Arrays.stream(component).map(TextComponent::new).toArray(BaseComponent[]::new);
+        }
+
+        DefaultMessage() {
         }
 
         /**
@@ -676,7 +724,7 @@ public final class Updater {
          * @param message Provided constant
          * @return All messages assigned to provided constant
          */
-        public static @NotNull String[] getMessages(@NotNull DefaultMessage message) {
+        public static BaseComponent[] getMessages(@NotNull DefaultMessage message) {
             return message.messages;
         }
 
@@ -685,7 +733,7 @@ public final class Updater {
          *
          * @return A messages assigned
          */
-        public @NotNull String[] getMessages() {
+        public @NotNull BaseComponent[] getMessages() {
             return messages;
         }
     }
