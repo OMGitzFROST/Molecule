@@ -62,7 +62,7 @@ public final class Updater {
     // The provider containing the latest update
     private static AbstractProvider activeProvider;
     // The plugin running this updater
-    private static TestPlugin plugin;
+    private static Plugin plugin;
     // The component that contains clickable links (sent to audience)
     private static TextComponent linkBar;
     // The result returned by the updater
