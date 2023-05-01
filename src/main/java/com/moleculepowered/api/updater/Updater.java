@@ -103,13 +103,29 @@ public final class Updater {
         enabled = true;
         permission = "";
         dataFolder = new File(plugin.getDataFolder().getParentFile(), "Updater");
-        File configFile = new File(dataFolder, "config.yml");
 
-        // ATTEMPT TO CREATE AND/OR LOAD THE CONFIGURATION
-        FileUtil.copy(MoleculeAPI.getResource("config.yml"), configFile);
+        final File updaterConfigFile = new File(dataFolder, "config.yml");
+        YamlConfiguration defaultConfig = new YamlConfiguration();
+        defaultConfig.options().header("This configuration file affects all plugins using the Updater system (https://www.spigotmc.org/threads/update-checker-multi-platform.602023/#post-4579485)" + '\n'
+                + "Some updating systems will not adhere to the disabled value, but these may be turned off in their plugin's configuration.");
+        defaultConfig.addDefault("enabled", true);
+        defaultConfig.addDefault("attempt-downloads", true);
+        defaultConfig.addDefault("play-sound", true);
+
+        // ATTEMPT TO CREATE DEFAULT CONFIGURATION
+        try {
+            if (!dataFolder.exists() && !dataFolder.mkdirs())
+                throw new IllegalArgumentException("Failed to create updater folder");
+            if (!updaterConfigFile.exists() && updaterConfigFile.createNewFile()) {
+                defaultConfig.options().copyDefaults(true);
+                defaultConfig.save(updaterConfigFile);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
         // LOAD CONFIGURATION VALUES
-        FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+        FileConfiguration config = YamlConfiguration.loadConfiguration(updaterConfigFile);
         globalEnabled = config.getBoolean("enabled");
         attemptDownload = config.getBoolean("attempt-downloads");
         soundEnabled = config.getBoolean("play-sound");
