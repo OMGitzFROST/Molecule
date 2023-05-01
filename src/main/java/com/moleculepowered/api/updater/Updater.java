@@ -1,7 +1,6 @@
 package com.moleculepowered.api.updater;
 
 import com.moleculepowered.api.MoleculeAPI;
-import com.moleculepowered.api.TestPlugin;
 import com.moleculepowered.api.event.updater.UpdateCompleteEvent;
 import com.moleculepowered.api.updater.provider.AbstractProvider;
 import com.moleculepowered.api.util.FileUtil;
@@ -99,7 +98,7 @@ public final class Updater {
      */
     public Updater(@NotNull Plugin plugin) {
         MoleculeAPI.setPlugin(plugin);
-        Updater.plugin = (TestPlugin) plugin;
+        Updater.plugin = plugin;
         interval = Time.parseInterval("3h");
         enabled = true;
         permission = "";
