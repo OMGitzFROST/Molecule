@@ -751,7 +751,10 @@ public final class Updater {
         private BaseComponent[] messages;
 
         DefaultMessage(String... messages) {
-            messages = Arrays.stream(messages).map(s -> ChatColor.translateAlternateColorCodes(ChatColor.COLOR_CHAR, s.replace('&', ChatColor.COLOR_CHAR))).toArray(String[]::new);
+            messages = Arrays.stream(messages)
+                    .filter(s -> !s.isEmpty())
+                    .map(s -> ChatColor.translateAlternateColorCodes(ChatColor.COLOR_CHAR, s.replace('&', ChatColor.COLOR_CHAR)))
+                    .toArray(String[]::new);
             this.messages = Arrays.stream(messages).map(TextComponent::new).toArray(BaseComponent[]::new);
         }
 
