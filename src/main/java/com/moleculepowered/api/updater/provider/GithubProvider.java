@@ -18,8 +18,6 @@ import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.moleculepowered.api.util.StringUtil.format;
-
 public class GithubProvider extends AbstractProvider {
 
     private final String REPO;
@@ -47,8 +45,10 @@ public class GithubProvider extends AbstractProvider {
                 final BufferedReader contributorReader = new BufferedReader(new InputStreamReader(contributorConn.getInputStream()));
                 // SET CONTRIBUTORS
                 JsonArray contributors = new Gson().fromJson(contributorReader, JsonArray.class);
-                for (JsonElement contributor : contributors) {
-                    this.contributors.add(contributor.getAsJsonObject().get("login").getAsString());
+                if (contributors != null) {
+                    for (JsonElement contributor : contributors) {
+                        this.contributors.add(contributor.getAsJsonObject().get("login").getAsString());
+                    }
                 }
             }
 
@@ -77,9 +77,7 @@ public class GithubProvider extends AbstractProvider {
 
             // DISCONNECT FROM RELEASE
             releaseConn.disconnect();
-        } catch (FileNotFoundException ex) {
-            throw new IllegalArgumentException(format("Invalid repository path: {0}", REPO), ex);
-        } catch (RateLimitReachedException ignored) {
+        } catch (FileNotFoundException | RateLimitReachedException ignored) {
             // IGNORED SO OTHER PROVIDERS CAN TAKE OVER
         } catch (IOException ex) {
             throw new ProviderFetchException("The provider failed to fetch the latest update", ex);
