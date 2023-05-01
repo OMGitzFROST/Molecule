@@ -102,3 +102,7 @@ fabric.properties
 # CUSTOM USER
 /target/
 /.idea/
+.DS_Store
+src/main/java/com/moleculepowered/api/TestPlugin.java
+src/main/resources/plugin.yml
+src/main/resources/config.yml
