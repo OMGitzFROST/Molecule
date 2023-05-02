@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 public final class Version {
+
     private String VERSION_PATTERN, MODIFIER_PATTERN;
     private String version, identifier;
     private String[] versionParts = {};
