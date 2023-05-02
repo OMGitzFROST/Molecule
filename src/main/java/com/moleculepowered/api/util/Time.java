@@ -5,6 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -92,13 +96,15 @@ public final class Time {
      * @param input The time that will be added to the start date
      * @return The new date
      * @throws IllegalArgumentException when an invalid input is entered
+     * @apiNote Decimal values are not allowed in the input, if you provide some, they will
+     * lose their decimal point, and we will add as usual.
      */
     public static @NotNull Date add(@NotNull Date start, @NotNull String input) {
 
         for (String current : input.split("\\s+")) {
 
             // CONFIGURE PARAMETERS
-            int quantity = getQuantity(current);
+            double quantity = getQuantity(current);
             String unit = getUnit(current);
 
             // CREATE CALENDAR OBJECT
@@ -110,52 +116,52 @@ public final class Time {
                 case "milli":
                 case "millisecond":
                 case "milliseconds":
-                    startDate.add(Calendar.MILLISECOND, quantity);
+                    startDate.add(Calendar.MILLISECOND, (int) quantity);
                     start = startDate.getTime();
                     break;
                 case "s":
                 case "sec":
                 case "second":
                 case "seconds":
-                    startDate.add(Calendar.SECOND, quantity);
+                    startDate.add(Calendar.SECOND, (int) quantity);
                     start = startDate.getTime();
                     break;
                 case "m":
                 case "min":
                 case "minute":
                 case "minutes":
-                    startDate.add(Calendar.MINUTE, quantity);
+                    startDate.add(Calendar.MINUTE, (int) quantity);
                     start = startDate.getTime();
                     break;
                 case "h":
                 case "hr":
                 case "hour":
                 case "hours":
-                    startDate.add(Calendar.HOUR, quantity);
+                    startDate.add(Calendar.HOUR, (int) quantity);
                     start = startDate.getTime();
                     break;
                 case "d":
                 case "day":
                 case "days":
-                    startDate.add(Calendar.DATE, quantity);
+                    startDate.add(Calendar.DATE, (int) quantity);
                     start = startDate.getTime();
                     break;
                 case "wk":
                 case "week":
                 case "weeks":
-                    startDate.add(Calendar.WEEK_OF_MONTH, quantity);
+                    startDate.add(Calendar.WEEK_OF_MONTH, (int) quantity);
                     start = startDate.getTime();
                     break;
                 case "mo":
                 case "month":
                 case "months":
-                    startDate.add(Calendar.MONTH, quantity);
+                    startDate.add(Calendar.MONTH, (int) quantity);
                     start = startDate.getTime();
                     break;
                 case "y":
                 case "year":
                 case "years":
-                    startDate.add(Calendar.YEAR, quantity);
+                    startDate.add(Calendar.YEAR, (int) quantity);
                     start = startDate.getTime();
                     break;
                 default:
@@ -163,6 +169,79 @@ public final class Time {
             }
         }
         return start;
+    }
+
+    /**
+     * <p>Adds a specified amount of time to the start date, please note that this method does require
+     * a specific format to be entered as its input, That format is as follows "[#][unit]", for example "2h".</p>
+     *
+     * <p>With that input, it will tell this method to add 2 hours to the provided date, please take a look at
+     * the table below for all available unit abbreviations that are accepted by this method</p>
+     *
+     * <table>
+     *     <col width="30%"/>
+     *     <col width="10%"/>
+     *     <col width="60%"/>
+     *     <thead>
+     *     <tr>
+     *         <th>Unit</th>
+     *         <th></th>
+     *         <th>Abbreviation</th>
+     *     </tr>
+     *     </thead>
+     *     <tbody>
+     *      <tr>
+     *          <td>Millisecond</td>
+     *          <td></td>
+     *          <td>[ms, milli, millisecond, milliseconds]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Second</td>
+     *          <td></td>
+     *          <td>[s, sec, second, seconds]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Minute</td>
+     *          <td></td>
+     *          <td>[m, min, minute, minutes]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Hour</td>
+     *          <td></td>
+     *          <td>[h, hr, hour, hours]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Day</td>
+     *          <td></td>
+     *          <td>[d, day, days]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Week</td>
+     *          <td></td>
+     *          <td>[wk, week, weeks]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Month</td>
+     *          <td></td>
+     *          <td>[mo, month, months]</td>
+     *      </tr>
+     *      <tr>
+     *          <td>Year</td>
+     *          <td></td>
+     *          <td>[y, year, years]</td>
+     *      </tr>
+     *   </tbody>
+     * </table>
+     *
+     * @param start The date that will be modified
+     * @param input The time that will be added to the start date
+     * @return The new date
+     * @throws IllegalArgumentException when an invalid input is entered
+     * @apiNote Decimal values are not allowed in the input, if you provide some, they will
+     * lose their decimal point, and we will add as usual.
+     */
+    public static @NotNull Date add(@NotNull String start, @NotNull String input) {
+        return add(parseDate(start), input);
     }
 
     /**
@@ -230,6 +309,8 @@ public final class Time {
      * @param input The time that will be added to today's date
      * @return The new date
      * @throws IllegalArgumentException when an invalid input is entered
+     * @apiNote Decimal values are not allowed in the input, if you provide some, they will
+     * lose their decimal point, and we will add as usual.
      */
     public static @NotNull Date add(@NotNull String input) {
         return add(new Date(), input);
@@ -301,6 +382,8 @@ public final class Time {
      * @param input The time that will be subtracted from the start date
      * @return A new date
      * @throws IllegalArgumentException when an invalid input is entered
+     * @apiNote Decimal values are not allowed in the input, if you provide some, they will
+     * lose their decimal point, and we will subtract as usual.
      */
     public static @NotNull Date subtract(@NotNull Date start, @NotNull String input) {
 
@@ -376,6 +459,8 @@ public final class Time {
      * @param input The time that will be subtracted to the start date
      * @return A new date
      * @throws IllegalArgumentException when an invalid input is entered
+     * @apiNote Decimal values are not allowed in the input, if you provide some, they will
+     * lose their decimal point, and we will subtract as usual.
      */
     public static @NotNull Date subtract(@NotNull String input) {
         return subtract(new Date(), input);
@@ -484,7 +569,7 @@ public final class Time {
      * @throws IllegalArgumentException when the input is not valid
      */
     public static long parseInterval(@NotNull String input) {
-        int quantity = getQuantity(input);
+        double quantity = getQuantity(input);
         String unit = getUnit(input);
 
         switch (unit) {
@@ -492,38 +577,38 @@ public final class Time {
             case "milli":
             case "millisecond":
             case "milliseconds":
-                return quantity / 50;
+                return (long) (quantity / 50);
             case "s":
             case "sec":
             case "second":
             case "seconds":
-                return (1000L * quantity) / 50;
+                return (long) ((1000L * quantity) / 50);
             case "m":
             case "min":
             case "minute":
             case "minutes":
-                return (60000L * quantity) / 50;
+                return (long) ((60000L * quantity) / 50);
             case "h":
             case "hr":
             case "hour":
             case "hours":
-                return (3600000L * quantity) / 50;
+                return (long) ((3600000L * quantity) / 50);
             case "d":
             case "day":
             case "days":
-                return (86400000L * quantity) / 50;
+                return (long) ((86400000L * quantity) / 50);
             case "wk":
             case "week":
             case "weeks":
-                return (604800000L * quantity) / 50;
+                return (long) ((604800000L * quantity) / 50);
             case "mo":
             case "month":
             case "months":
-                return (2629800000L * quantity) / 50;
+                return (long) ((2629800000L * quantity) / 50);
             case "y":
             case "year":
             case "years":
-                return (31557600000L * quantity) / 50;
+                return (long) ((31557600000L * quantity) / 50);
             default:
                 throw new IllegalArgumentException("Invalid interval format provided: " + input);
         }
@@ -540,7 +625,7 @@ public final class Time {
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is before the compared date.
      */
-    public boolean isBeforeDate(@NotNull String target, @NotNull String comparedTo) {
+    public static boolean isBeforeDate(@NotNull String target, @NotNull String comparedTo) {
         return parseDate(target).before(parseDate(comparedTo));
     }
 
@@ -551,7 +636,7 @@ public final class Time {
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is before the compared date.
      */
-    public boolean isBeforeDate(@NotNull String target, @NotNull Date comparedTo) {
+    public static boolean isBeforeDate(@NotNull String target, @NotNull Date comparedTo) {
         return parseDate(target).before(comparedTo);
     }
 
@@ -562,7 +647,7 @@ public final class Time {
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is before the compared date.
      */
-    public boolean isBeforeDate(@NotNull Date target, @NotNull String comparedTo) {
+    public static boolean isBeforeDate(@NotNull Date target, @NotNull String comparedTo) {
         return target.before(parseDate(comparedTo));
     }
 
@@ -573,7 +658,7 @@ public final class Time {
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is before the compared date.
      */
-    public boolean isBeforeDate(@NotNull Date target, @NotNull Date comparedTo) {
+    public static boolean isBeforeDate(@NotNull Date target, @NotNull Date comparedTo) {
         return target.before(comparedTo);
     }
 
@@ -584,7 +669,7 @@ public final class Time {
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is after the compared date.
      */
-    public boolean isAfterDate(@NotNull String target, @NotNull String comparedTo) {
+    public static boolean isAfterDate(@NotNull String target, @NotNull String comparedTo) {
         return parseDate(target).after(parseDate(comparedTo));
     }
 
@@ -595,7 +680,7 @@ public final class Time {
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is after the compared date.
      */
-    public boolean isAfterDate(@NotNull Date target, @NotNull Date comparedTo) {
+    public static boolean isAfterDate(@NotNull Date target, @NotNull Date comparedTo) {
         return target.after(comparedTo);
     }
 
@@ -606,7 +691,7 @@ public final class Time {
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is after the compared date.
      */
-    public boolean isAfterDate(@NotNull String target, @NotNull Date comparedTo) {
+    public static boolean isAfterDate(@NotNull String target, @NotNull Date comparedTo) {
         return parseDate(target).after(comparedTo);
     }
 
@@ -617,7 +702,7 @@ public final class Time {
      * @param comparedTo The date you will compare the target to.
      * @return Whether the target date is after the compared date.
      */
-    public boolean isAfterDate(@NotNull Date target, @NotNull String comparedTo) {
+    public static boolean isAfterDate(@NotNull Date target, @NotNull String comparedTo) {
         return target.after(parseDate(comparedTo));
     }
 
@@ -636,15 +721,19 @@ public final class Time {
      * @return Time until target date.
      */
     public static String getTimeRemaining(@NotNull Date start, @NotNull Date end) {
-        long diff = end.getTime() - start.getTime();
-        long seconds = (diff / 1000) % 60;
-        long minutes = (diff / (1000 * 60)) % 60;
-        long hours = (diff / (1000 * 60 * 60)) % 24;
-        long days = (diff / (1000 * 60 * 60 * 24)) % 365;
-        long years = (diff / (1000L * 60 * 60 * 24 * 365));
-        // MONTHS IS NOT CALCULATED BECAUSE LEAP YEARS CAN INTERFERE
+        Duration d1 = Duration.between(start.toInstant(), end.toInstant());
+        long seconds = (d1.getSeconds()) % 60;
+        long minutes = (d1.toMinutes()) % 60;
+        long hours = (d1.toHours()) % 24;
 
-        String[] remainFormat = String.format("%02dy %02dd %02dh %02dm %02ds", years, days, hours, minutes, seconds).split("\\s+");
+        LocalDate ld1 = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate ld2 = end.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        Period age = Period.between(ld1, ld2);
+        long days = age.getDays();
+        long months = age.getMonths();
+        long years = age.getYears();
+
+        String[] remainFormat = String.format("%02dy %02dmo %02dd %02dh %02dm %02ds", years, months, days, hours, minutes, seconds).split("\\s+");
         return Arrays.stream(remainFormat).filter(current -> !current.contains("00") && !current.equals("00s")).collect(Collectors.joining(" "));
     }
 
@@ -700,20 +789,21 @@ public final class Time {
      * @return Time until target date.
      */
     public static String getTimeRemaining(@NotNull String end) {
-        return getTimeRemaining(getToday(), end);
+        return getTimeRemaining(getToday().getTime(), end);
     }
 
     /**
-     * A method used to return the amount of time remaining until a specified date. if any of the values
-     * listed in the format below return 0, this method will remove it from the returned string
-     * <br><br/>
-     * <strong>String Format: year(s) day(s) hour(s) minute(s) second(s).</strong>
+     * <p>A method used to return the amount of time remaining until a specified date.
+     * If any of the values listed in the format below return 0, this method will remove
+     * it from the returned string.</p>
+     *
+     * <p><strong>String Format: year(s) day(s) hour(s) minute(s) second(s).</strong></p>
      *
      * @param end Target date
      * @return Time until target date.
      */
     public static String getTimeRemaining(@NotNull Date end) {
-        return getTimeRemaining(getToday(), end);
+        return getTimeRemaining(getToday().getTime(), end);
     }
 
     /*
@@ -725,8 +815,8 @@ public final class Time {
      *
      * @return Today's date
      */
-    public static @NotNull Date getToday() {
-        return new Date();
+    public static @NotNull Calendar getToday() {
+        return Calendar.getInstance();
     }
 
     /**
@@ -764,9 +854,9 @@ public final class Time {
      * @param input Provided input
      * @return The quantity or "0"
      */
-    private static @NotNull Integer getQuantity(String input) {
-        Matcher quantityMatcher = Pattern.compile("-?\\d+").matcher(input != null ? input : "0");
-        return quantityMatcher.find() ? Integer.parseInt(quantityMatcher.group()) : 0;
+    private static @NotNull Double getQuantity(String input) {
+        Matcher quantityMatcher = Pattern.compile("(-?\\d+(\\.\\d*)?)|(-?\\.\\d+)").matcher(input != null ? input : "0");
+        return quantityMatcher.find() ? Double.parseDouble(quantityMatcher.group()) : 0;
     }
 
     /**
