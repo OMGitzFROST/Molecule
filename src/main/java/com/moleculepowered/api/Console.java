@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.moleculepowered.api.localization.i18n.tl;
+
 /**
  * A utility class used to handle all tasks that require logging, and console color conversions
  *
@@ -110,7 +112,7 @@ public final class Console {
      * @see #setDebugToggle(boolean)
      */
     public static void debug(boolean condition, String message, Object... param) {
-        log(condition, Level.INFO, DEBUG_PREFIX + " " + message, param);
+        log(condition, Level.INFO, DEBUG_PREFIX + " " + tl(message), param);
     }
 
     /**
@@ -276,7 +278,7 @@ public final class Console {
      * @param param     Optional parameters
      */
     public static void success(boolean condition, String message, Object... param) {
-        log(condition, Level.INFO, ConsoleColor.colorize(ConsoleColor.GREEN, message), param);
+        log(condition, Level.INFO, ConsoleColor.colorize(ConsoleColor.GREEN, tl(message)), param);
     }
 
     /**
@@ -357,7 +359,7 @@ public final class Console {
      * @param param     Optional parameters
      */
     public static void warning(boolean condition, String message, Object... param) {
-        log(condition, Level.WARNING, ConsoleColor.colorize(ConsoleColor.GOLD, message), param);
+        log(condition, Level.WARNING, ConsoleColor.colorize(ConsoleColor.GOLD, tl(message)), param);
     }
 
     /**
@@ -438,7 +440,7 @@ public final class Console {
      * @param param     Optional parameters
      */
     public static void severe(boolean condition, String message, Object... param) {
-        log(condition, Level.SEVERE, ConsoleColor.colorize(ConsoleColor.RED, message), param);
+        log(condition, Level.SEVERE, ConsoleColor.colorize(ConsoleColor.RED, tl(message)), param);
     }
 
     /**
@@ -485,7 +487,7 @@ public final class Console {
      * @param param     Optional parameters
      */
     public static void log(boolean condition, Level level, String message, Object... param) {
-        if (condition) LOGGER.log(level, getPrefix() + ConsoleColor.parse(message), param);
+        if (condition) LOGGER.log(level, getPrefix() + ConsoleColor.parse(tl(message)), param);
     }
 
     /**
