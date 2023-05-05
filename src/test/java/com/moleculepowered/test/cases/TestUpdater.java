@@ -14,9 +14,10 @@ import org.junit.jupiter.api.Test;
 public final class TestUpdater extends AbstractTest {
 
     @Test
-    @DisplayName("Ensure update configures itself correctly")
+    @DisplayName("Ensure updater is working as intended")
     public void testUpdater() {
 
+        // INITIALIZE UPDATER
         Updater updater = new Updater(plugin)
                 .addProvider(new GithubProvider("EssentialsX/Essentials"))
                 .addProvider(new SpigetProvider(9089))
@@ -24,11 +25,17 @@ public final class TestUpdater extends AbstractTest {
                 .addProvider(new BukkitProvider(93271));
         updater.initialize();
 
-        // ASSERT DEFAULTS ARE INTACT
+        // ASSERT INTERVAL WAS PARSED CORRECTLY AND CORRECTLY MIRRORS DEFAULT
         Assertions.assertEquals(updater.getInterval(), Time.parseInterval("3h"));
+
+        // ASSERT REQUIREMENTS ARE NOT NULL
         Assertions.assertNotNull(updater.getResult());
         Assertions.assertNotNull(updater.getPermission());
+
+        // ASSERT BETA IS NOT ENABLED SINCE IT WAS NOT ENABLED IN THE CHAIN
         Assertions.assertFalse(updater.isBetaEnabled());
+
+        // ASSERT UPDATER IS ENABLED BY DEFAULT
         Assertions.assertTrue(updater.isEnabled());
     }
 }
