@@ -1,5 +1,6 @@
 package com.moleculepowered.api.util;
 
+import com.moleculepowered.api.MoleculeAPI;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 public final class FileUtil {
 
@@ -34,7 +36,7 @@ public final class FileUtil {
     }
 
     /*
-    FILE HANDLING
+    RESOURCE HANDLING
      */
 
     /**
@@ -66,12 +68,45 @@ public final class FileUtil {
 
             if (replace) Files.copy(in, location.toPath(), StandardCopyOption.REPLACE_EXISTING);
             else Files.copy(in, location.toPath());
-        }
-        catch (FileAlreadyExistsException ignored) {
+        } catch (FileAlreadyExistsException ignored) {
             // IGNORED
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    /**
+     * Returns a resource from within MoleculeAPI, please note that this should not be used to
+     * return a resource from within your own plugin's resource folder.
+     *
+     * @param name Resource name
+     * @return A resource from MoleculeAPI
+     */
+    public static @NotNull InputStream getResource(@NotNull String name) {
+        return Objects.requireNonNull(MoleculeAPI.class.getClassLoader().getResourceAsStream(name));
+    }
+
+    /**
+     * <p>Used to save an internal resource to the specified location. <b>By default, this method will
+     * overwrite existing files</b>
+     *
+     * @param path     Target resource path
+     * @param location Target location
+     */
+    public static void saveResource(String path, File location) {
+        saveResource(path, location, true);
+    }
+
+    /**
+     * Used to save an internal resource to the specified location, with this method you can
+     * specify whether we should override an existing file by setting the boolean parameter
+     * to true, otherwise set the value to false.
+     *
+     * @param path     Target resource path
+     * @param location Target location
+     * @param replace  Whether we should overwrite existing files
+     */
+    public static void saveResource(String path, File location, boolean replace) {
+        copy(getResource(path), location, replace);
     }
 }
