@@ -56,7 +56,7 @@ public class UpdateCompleteEvent extends AbstractEvent implements Cancellable {
      *
      * @return The latest version
      */
-    public @NotNull Version getVersion() {
+    public @NotNull Version getRelease() {
         return provider.getRelease();
     }
 
@@ -90,8 +90,8 @@ public class UpdateCompleteEvent extends AbstractEvent implements Cancellable {
     }
 
     /**
-     * Return's true if the provided player is considered an authorized audience member. Otherwise this
-     * method will return false.
+     * Return's true if the provided player is considered an authorized audience member.
+     * Otherwise, this method will return false.
      *
      * @param player Target player
      * @return true if player is an authorized audience member
@@ -105,9 +105,9 @@ public class UpdateCompleteEvent extends AbstractEvent implements Cancellable {
      */
 
     /**
-     * Return's true if this event was cancelled
+     * Return's true if this event was canceled
      *
-     * @return true if cancelled
+     * @return true if canceled
      */
     @Override
     public boolean isCancelled() {
