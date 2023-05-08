@@ -1,0 +1,9 @@
+#
+# Assigns OMGitzFROST for any PR unless a check below matches.
+#
+*    @OMGitzFROST
+
+#
+# Assigns Andre601 to any PR that targets the wiki folder.
+#
+*.md @OMGitzFROST
