@@ -1,4 +1,4 @@
-package com.moleculepowered.test.cases;
+package com.moleculepowered.test.updater;
 
 import com.moleculepowered.api.event.updater.UpdateCompleteEvent;
 import com.moleculepowered.api.updater.Updater;

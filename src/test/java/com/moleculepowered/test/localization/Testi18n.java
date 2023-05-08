@@ -1,4 +1,4 @@
-package com.moleculepowered.test.cases;
+package com.moleculepowered.test.localization;
 
 import com.moleculepowered.api.localization.i18n;
 import com.moleculepowered.test.AbstractTest;

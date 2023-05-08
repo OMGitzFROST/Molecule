@@ -1,4 +1,4 @@
-package com.moleculepowered.test.cases;
+package com.moleculepowered.test.util;
 
 import com.moleculepowered.api.util.StringUtil;
 import com.moleculepowered.test.AbstractTest;
