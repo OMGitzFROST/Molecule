@@ -1,6 +1,7 @@
 package com.moleculepowered.api.localization;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.moleculepowered.api.util.StringUtil.format;
 
@@ -31,7 +32,7 @@ public class i18n {
      *
      * @param translator Functional translator
      */
-    public final void setTranslator(@NotNull Translator translator) {
+    public final void setTranslator(@Nullable Translator translator) {
         this.translator = translator;
     }
 
