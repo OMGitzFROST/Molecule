@@ -21,8 +21,18 @@ public final class FileUtil {
      * @param input Provided input
      * @return The file name from a string path
      */
-    public static @NotNull String getFileName(String input) {
+    public static @NotNull String getFileName(@NotNull String input) {
         return getFileName(Paths.get(input));
+    }
+
+    /**
+     * Used to return the file name from a file input and will include its file extension
+     *
+     * @param input Provided input
+     * @return The file name from a string path
+     */
+    public static @NotNull String getFileName(@NotNull File input) {
+        return getFileName(input.toPath());
     }
 
     /**
@@ -94,7 +104,7 @@ public final class FileUtil {
      * @param location Target location
      */
     public static void saveResource(String path, File location) {
-        saveResource(path, location, true);
+        saveResource(getResource(path), location, true);
     }
 
     /**
@@ -107,6 +117,30 @@ public final class FileUtil {
      * @param replace  Whether we should overwrite existing files
      */
     public static void saveResource(String path, File location, boolean replace) {
-        copy(getResource(path), location, replace);
+        saveResource(getResource(path), location, replace);
+    }
+
+    /**
+     * <p>Used to save an internal resource to the specified location. <b>By default, this method will
+     * overwrite existing files</b>
+     *
+     * @param input    Target resource path
+     * @param location Target location
+     */
+    public static void saveResource(InputStream input, File location) {
+        saveResource(input, location, true);
+    }
+
+    /**
+     * Used to save an internal resource to the specified location, with this method you can
+     * specify whether we should override an existing file by setting the boolean parameter
+     * to true, otherwise set the value to false.
+     *
+     * @param input    Target input stream
+     * @param location Target location
+     * @param replace  Whether we should overwrite existing files
+     */
+    public static void saveResource(InputStream input, File location, boolean replace) {
+        copy(input, location, replace);
     }
 }
