@@ -105,30 +105,22 @@ public final class Updater {
         dataFolder = new File(plugin.getDataFolder().getParentFile(), "Updater");
 
         final File updaterConfigFile = new File(dataFolder, "config.yml");
+        String GLOBAL_ENABLED = "enabled";
+        String ATTEMPT_DOWNLOAD = "attempt-downloads";
+        String SOUND_ENABLED = "play-sound";
+
         YamlConfiguration defaultConfig = new YamlConfiguration();
         defaultConfig.options().header("This configuration file affects all plugins using the Updater system (https://www.spigotmc.org/threads/update-checker-multi-platform.602023/#post-4579485)" + '\n'
                 + "Some updating systems will not adhere to the disabled value, but these may be turned off in their plugin's configuration.");
-        defaultConfig.addDefault("enabled", true);
-        defaultConfig.addDefault("attempt-downloads", true);
-        defaultConfig.addDefault("play-sound", true);
-
-        // ATTEMPT TO CREATE DEFAULT CONFIGURATION
-        try {
-            if (!dataFolder.exists() && !dataFolder.mkdirs())
-                throw new IllegalArgumentException("Failed to create updater folder");
-            if (!updaterConfigFile.exists() && updaterConfigFile.createNewFile()) {
-                defaultConfig.options().copyDefaults(true);
-                defaultConfig.save(updaterConfigFile);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        defaultConfig.addDefault(GLOBAL_ENABLED, true);
+        defaultConfig.addDefault(ATTEMPT_DOWNLOAD, true);
+        defaultConfig.addDefault(SOUND_ENABLED, true);
 
         // LOAD CONFIGURATION VALUES
         FileConfiguration config = YamlConfiguration.loadConfiguration(updaterConfigFile);
-        globalEnabled = config.getBoolean("enabled");
-        attemptDownload = config.getBoolean("attempt-downloads");
-        soundEnabled = config.getBoolean("play-sound");
+        globalEnabled = config.getBoolean(GLOBAL_ENABLED, true);
+        attemptDownload = config.getBoolean(ATTEMPT_DOWNLOAD, true);
+        soundEnabled = config.getBoolean(SOUND_ENABLED, true);
     }
 
     /*
@@ -143,15 +135,6 @@ public final class Updater {
      * @see #scheduleAsync()
      */
     public void schedule() {
-        // FIRST, VERIFY THAT ALL REQUIREMENTS ARE MET BEFORE SCHEDULING
-        if (!globalEnabled || !enabled) {
-            result = UpdateResult.DISABLED;
-            return;
-        }
-
-        // INITIALIZE TASK TIMER AND REGISTER LISTENERS
-        plugin.getServer().getPluginManager().registerEvents(listener != null ? listener : new MessageHandler(this), plugin);
-        plugin.getServer().getPluginManager().registerEvents(new AudienceListener(this), plugin);
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> initialize(), 0, interval);
     }
 
@@ -163,13 +146,6 @@ public final class Updater {
      * @see #schedule()
      */
     public void scheduleAsync() {
-        // FIRST, VERIFY THAT ALL REQUIREMENTS ARE MET BEFORE SCHEDULING
-        if (!globalEnabled || !enabled) {
-            result = UpdateResult.DISABLED;
-            return;
-        }
-
-        plugin.getServer().getPluginManager().registerEvents(listener != null ? listener : new MessageHandler(this), plugin);
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> initialize(true), 0, interval);
     }
 
@@ -184,6 +160,16 @@ public final class Updater {
      * @see #initialize()
      */
     public void initialize(boolean async) {
+
+        // INITIALIZE TASK TIMER AND REGISTER LISTENERS
+        plugin.getServer().getPluginManager().registerEvents(listener != null ? listener : new MessageHandler(this), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new AudienceListener(this), plugin);
+
+        // FIRST, VERIFY THAT ALL REQUIREMENTS ARE MET BEFORE SCHEDULING
+        if (!globalEnabled || !enabled) {
+            result = UpdateResult.DISABLED;
+            return;
+        }
 
         // CREATE AN INSTANCE OF THE CURRENT PROVIDER
         Version currentVersion = new Version(plugin.getDescription().getVersion());
@@ -606,7 +592,7 @@ public final class Updater {
     }
 
     /**
-     * Sends a notification determined by the result configured by the updater.
+     * A utility class used to sends a notification determined by the result configured by this updater.
      */
     private void sendNotification(@NotNull AudienceType type, @NotNull DefaultMessage message) {
 
@@ -628,7 +614,7 @@ public final class Updater {
     }
 
     /*
-    INTERNAL CLASSES
+    LISTENER CLASSES
      */
 
     /**
@@ -643,14 +629,17 @@ public final class Updater {
         private final Updater updater;
         private UpdateResult result;
 
-        /*
-        EVENT HANDLERS
-         */
-
         public MessageHandler(Updater updater) {
             this.updater = updater;
         }
 
+        /**
+         * Used to listen for when the updater finishes and send out the notification to all
+         * online audience members, if a member is not online, they will be handled by the
+         * {@link #onPlayerJoin(PlayerJoinEvent)} method defined in this class.
+         *
+         * @param event Update complete event
+         */
         @EventHandler
         public void onUpdateComplete(@NotNull UpdateCompleteEvent event) {
 
@@ -676,6 +665,12 @@ public final class Updater {
             }
         }
 
+        /**
+         * Used to listen for audience members joining the server and notifying them of
+         * updates if permitted
+         *
+         * @param event Join Event
+         */
         @EventHandler
         public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
 
@@ -685,18 +680,6 @@ public final class Updater {
             // SEND NOTIFICATION IF PLAYER IS AUDIENCE MEMBER
             updater.sendNotification(AudienceType.PLAYER, DefaultMessage.UPDATE_AVAILABLE);
         }
-    }
-
-    /**
-     * Primarily used to define the type of audience the {@link #sendNotification(AudienceType, DefaultMessage)}
-     * method should send a message to.
-     *
-     * @author OMGitzFROST
-     */
-    private enum AudienceType {
-        CONSOLE,
-        PLAYER,
-        ALL
     }
 
     /**
@@ -725,13 +708,17 @@ public final class Updater {
         }
     }
 
+    /*
+    ENUM CLASSES
+     */
+
     /**
      * The enum used to provide us will all default messages associated with each update result
      *
      * @author OMGitzFROST
      */
     private enum DefaultMessage {
-        DISABLED,
+        DISABLED("&6The updater is currently disabled, therefore, we will check for updates..."),
         DOWNLOADED(format("&aSuccessfully downloaded (&e{0} v{1}&a), Please install it from your update folder", plugin.getName(), activeProvider.getRelease().getVersion())),
         EXISTS(format("&e{0} v{1} &ais already downloaded, Please Check your Update folder and install it", plugin.getName(), activeProvider.getRelease().getVersion())),
         LATEST(format("&6No updates were found...")),
@@ -750,18 +737,41 @@ public final class Updater {
 
         private BaseComponent[] messages;
 
-        DefaultMessage(String... messages) {
-            messages = Arrays.stream(messages)
+        /**
+         * <p>Creates a constructor for this enum that allows our contents to accept a {@link String}
+         * array as its parameters. This method ensures that no empty strings will be allowed in
+         * the final String array to make sure no empty strings gets printed out where ever
+         * these messages are used.</p>
+         *
+         * <p>Please ensure that these base components are not null.</p>
+         *
+         * @param input Components to be accepted.
+         */
+        DefaultMessage(@NotNull String... input) {
+            input = Arrays.stream(input)
                     .filter(s -> !s.isEmpty())
                     .map(s -> ChatColor.translateAlternateColorCodes(ChatColor.COLOR_CHAR, s.replace('&', ChatColor.COLOR_CHAR)))
                     .toArray(String[]::new);
-            this.messages = Arrays.stream(messages).map(TextComponent::new).toArray(BaseComponent[]::new);
+            this.messages = Arrays.stream(input).map(TextComponent::new).toArray(BaseComponent[]::new);
         }
 
-        DefaultMessage(BaseComponent... component) {
+        /**
+         * <p>Creates a constructor for this enum that allows our contents to accept a {@link BaseComponent}
+         * array as its parameters. This method ensures that no empty strings will be allowed in
+         * the final String array to make sure no empty strings gets printed out where ever
+         * these messages are used.</p>
+         *
+         * <p>Please ensure that these base components are not null.</p>
+         *
+         * @param component Components to be accepted.
+         */
+        DefaultMessage(@NotNull BaseComponent... component) {
             this.messages = Arrays.stream(component).map(TextComponent::new).toArray(BaseComponent[]::new);
         }
 
+        /**
+         * DO NOT REMOVE, Simply created to allow constants to remain as their un-parameterized selves.
+         */
         DefaultMessage() {
         }
 
@@ -783,5 +793,28 @@ public final class Updater {
         public @NotNull BaseComponent[] getMessages() {
             return messages;
         }
+    }
+
+    /**
+     * Primarily used to define the type of audience the {@link #sendNotification(AudienceType, DefaultMessage)}
+     * method should send a message to.
+     *
+     * @author OMGitzFROST
+     */
+    private enum AudienceType {
+        /**
+         * Indicates that the audience will be the console
+         */
+        CONSOLE,
+        /**
+         * Indicates that the audience will be the players specified by the {@link #getAudience()}
+         * method.
+         */
+        PLAYER,
+        /**
+         * Indicates that both the console and the {@link #getAudience()} will be the audience
+         * being used by the task.
+         */
+        ALL
     }
 }
