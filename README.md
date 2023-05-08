@@ -25,9 +25,9 @@ frameworks such as Sponge, Velocity, etc.
 Currently, this API is under constant development, therefore, we're constantly adding new features within it, but as of now these are the features it currently supports
 * Feature packed updater
 * Enhanced console logging
+* Easy Localization
 
 ### Upcoming Features
-* Localization with properties file or yml files
 * Enhanced Configurations
 * User Management System
 
