@@ -1,5 +1,7 @@
 package com.moleculepowered.api;
 
+import com.moleculepowered.api.localization.Translator;
+import com.moleculepowered.api.localization.i18n;
 import com.moleculepowered.api.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -638,6 +640,17 @@ public final class Console {
      */
     public static void setPrettyPrint(boolean toggle) {
         prettyPrint = toggle;
+    }
+
+    /**
+     * Used to update the translator for your project, please any using this method
+     * will also override any other class using translating method, it is recommended
+     * to set this value once within your project.
+     *
+     * @param translator Functional translator.
+     */
+    public static void setTranslator(@Nullable Translator translator) {
+        i18n.setTranslator(translator);
     }
 
     /*
