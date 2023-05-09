@@ -18,7 +18,6 @@ public class i18n {
      * The main constructor used to initialize all required objects for this class.
      */
     public i18n() {
-        instance = this;
         translator = key -> key;
     }
 
@@ -27,13 +26,12 @@ public class i18n {
      */
 
     /**
-     * Used to set the translator that will be used for our translation
-     * methods.
+     * Used to set the translator that will be used for our translation methods
      *
      * @param translator Functional translator
      */
-    public final void setTranslator(@Nullable Translator translator) {
-        this.translator = translator;
+    public static void setTranslator(@Nullable Translator translator) {
+        getInstance().translator = translator;
     }
 
     /*
@@ -71,6 +69,18 @@ public class i18n {
      * @see #translate(String, Object...)
      */
     public static @NotNull String tl(String key, Object... param) {
-        return instance.translate(key, param);
+        return getInstance().translate(key, param);
+    }
+
+    /**
+     * A utility method used to return an instance of this class, it enabled easy access to non-static
+     * objects and methods. Please note that this method has a built-in check to initialize the
+     * {@link #instance} variable, if its null it initializes it.
+     *
+     * @return An instance of this class
+     */
+    private static i18n getInstance() {
+        if (instance == null) instance = new i18n();
+        return instance;
     }
 }
