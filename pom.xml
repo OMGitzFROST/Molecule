@@ -10,8 +10,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>bukkit</module>
-        <module>bukkit/v1_19_R3</module>
-        <module>bukkit/v1_8_R3</module>
     </modules>
 
     <properties>

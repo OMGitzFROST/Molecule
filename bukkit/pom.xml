@@ -10,6 +10,13 @@
     </parent>
 
     <artifactId>bukkit</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>bukkit-core</module>
+        <module>v1_19_R3</module>
+        <module>v1_8_R3</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -23,25 +30,4 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
     </repositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.8.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.moleculepowered.api</groupId>
-            <artifactId>v1_19_R3</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.moleculepowered.api</groupId>
-            <artifactId>v1_8_R3</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
 </project>

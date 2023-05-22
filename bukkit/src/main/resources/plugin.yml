@@ -1,4 +1,0 @@
-main: com.moleculepowered.api.TestPlugin
-name: TestPlugin
-version: 1.0
-api-version: 1.13
