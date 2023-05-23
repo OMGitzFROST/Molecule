@@ -9,7 +9,7 @@ public class PlayerAdapter_v1_19_R3 implements PlayerAdapter {
 
     private final Player player;
 
-    PlayerAdapter_v1_19_R3(@NotNull Player player) {
+    public PlayerAdapter_v1_19_R3(@NotNull Player player) {
         this.player = player;
     }
 
