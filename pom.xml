@@ -11,11 +11,6 @@
     <modules>
         <module>bukkit</module>
         <module>api</module>
-        <module>bukkit/v1_12_R1</module>
-        <module>bukkit/v1_15_R1</module>
-        <module>bukkit/v1_16_R3</module>
-        <module>bukkit/v1_17_R1</module>
-        <module>bukkit/v1_18_R2</module>
     </modules>
 
     <properties>
