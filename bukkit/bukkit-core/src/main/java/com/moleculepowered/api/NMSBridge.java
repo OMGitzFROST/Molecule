@@ -48,7 +48,7 @@ public final class NMSBridge {
     public static @NotNull ConfigAdapter adaptConfig(@NotNull FileConfiguration config) {
         try {
             Class<?> classDefinition = Class.forName(getPackage(ConfigAdapter.class));
-            Constructor<?> cons = classDefinition.getConstructor(config.getClass());
+            Constructor<?> cons = classDefinition.getConstructor(FileConfiguration.class);
             return (ConfigAdapter) cons.newInstance(config);
         }
         catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
