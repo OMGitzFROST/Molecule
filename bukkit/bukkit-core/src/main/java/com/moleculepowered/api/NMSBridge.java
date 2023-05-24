@@ -35,7 +35,7 @@ public final class NMSBridge {
             return (PlayerAdapter) cons.newInstance(player);
         }
         catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
-            throw new IllegalArgumentException("Failed to create player adapter using the provided player object");
+            throw new IllegalArgumentException("Failed to create player adapter using the provided player object", ex);
         }
     }
 
@@ -52,7 +52,7 @@ public final class NMSBridge {
             return (ConfigAdapter) cons.newInstance(config);
         }
         catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
-            throw new IllegalArgumentException("Failed to create config adapter using the provided config object");
+            throw new IllegalArgumentException("Failed to create config adapter using the provided config object", ex);
         }
     }
 
