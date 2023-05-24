@@ -71,7 +71,7 @@ public final class NMSBridge {
      * @return A package pointing to a class version
      */
     private static @NotNull String getPackage(@NotNull Class<?> clazz) {
-        return getPackage(clazz.getName());
+        return getPackage(clazz.getSimpleName());
     }
 
     /**
