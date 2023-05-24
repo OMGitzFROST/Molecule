@@ -85,8 +85,7 @@ public final class NMSBridge {
      * @return A package pointing to a class version
      */
     private static @NotNull String getPackage(@NotNull String className) {
-        String rawV = Bukkit.getServer().getClass().getPackage().getName();
-        String finalV = rawV.substring(rawV.lastIndexOf('.') + 1);
-        return "com.moleculepowered.api." + className + "_" + finalV;
+        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        return "com.moleculepowered.api." + className + "_" + version;
     }
 }
