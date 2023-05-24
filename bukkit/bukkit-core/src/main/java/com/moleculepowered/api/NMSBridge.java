@@ -31,7 +31,7 @@ public final class NMSBridge {
     public static @NotNull PlayerAdapter adaptPlayer(@NotNull Player player) {
         try {
             Class<?> classDefinition = Class.forName(getPackage(PlayerAdapter.class));
-            Constructor<?> cons = classDefinition.getConstructor(player.getClass());
+            Constructor<?> cons = classDefinition.getConstructor(Player.class);
             return (PlayerAdapter) cons.newInstance(player);
         }
         catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {

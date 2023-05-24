@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>bukkit-core</artifactId>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -86,12 +87,6 @@
         <dependency>
             <groupId>com.moleculepowered.api</groupId>
             <artifactId>v1_8_R3</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.moleculepowered.api</groupId>
-            <artifactId>api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
