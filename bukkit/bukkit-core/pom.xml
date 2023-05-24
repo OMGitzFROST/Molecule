@@ -31,6 +31,60 @@
         </dependency>
         <dependency>
             <groupId>com.moleculepowered.api</groupId>
+            <artifactId>v1_18_R2</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered.api</groupId>
+            <artifactId>v1_17_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered.api</groupId>
+            <artifactId>v1_16_R3</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered.api</groupId>
+            <artifactId>v1_15_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered.api</groupId>
+            <artifactId>v1_14_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered.api</groupId>
+            <artifactId>v1_13_R2</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered.api</groupId>
+            <artifactId>v1_12_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered.api</groupId>
+            <artifactId>v1_11_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered.api</groupId>
+            <artifactId>v1_10_R1</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered.api</groupId>
             <artifactId>v1_8_R3</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
