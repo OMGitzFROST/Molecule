@@ -10,11 +10,22 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * A {@link UserManager} class created for the bukkit platform, it handles all tasks related
+ * to the users handled by this platform. Allowing you to add, remove or replace existing users.
+ *
+ * @author OMGitzFROST
+ */
 public class BukkitUserManager implements UserManager {
 
     private final MoleculePlugin plugin;
     private final Set<User> users = new HashSet<>();
 
+    /**
+     * Creates a new instance of the user manager for the bukkit platform
+     *
+     * @param plugin Plugin that handles this manager.
+     */
     public BukkitUserManager(MoleculePlugin plugin) {
         this.plugin = plugin;
     }
@@ -28,6 +39,12 @@ public class BukkitUserManager implements UserManager {
      */
     @Override
     public void onEnable() {
+
+        // ENSURE USER DATA FOLDER EXISTS BEFORE ANYTHING
+        if (!plugin.getUserDataFolder().exists() && !plugin.getUserDataFolder().mkdirs()) {
+            throw new IllegalArgumentException("Failed to create user data folder");
+        }
+
         Arrays.stream(Objects.requireNonNull(plugin.getUserDataFolder().listFiles())).forEach(file -> {
             UUID uuid = UUID.fromString(file.getName().replace(".yml", ""));
             users.add(new BukkitUser(plugin, uuid));

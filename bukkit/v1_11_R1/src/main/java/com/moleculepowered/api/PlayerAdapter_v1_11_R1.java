@@ -3,13 +3,12 @@ package com.moleculepowered.api;
 import com.moleculepowered.api.adapter.PlayerAdapter;
 import org.bukkit.entity.Player;
 
-import java.util.Objects;
-
-public class BukkitPlayerAdapter implements PlayerAdapter {
+@SuppressWarnings("unused")
+public class PlayerAdapter_v1_11_R1 implements PlayerAdapter {
 
     private final Player player;
 
-    public BukkitPlayerAdapter(Player player) {
+    public PlayerAdapter_v1_11_R1(Player player) {
         this.player = player;
     }
 
@@ -20,6 +19,6 @@ public class BukkitPlayerAdapter implements PlayerAdapter {
      */
     @Override
     public String getLocale() {
-        return Objects.requireNonNull(NMSBridge.adaptPlayer(player)).getLocale();
+        return player.spigot().getLocale();
     }
 }

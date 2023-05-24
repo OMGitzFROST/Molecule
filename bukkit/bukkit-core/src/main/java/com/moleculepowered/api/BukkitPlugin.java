@@ -6,6 +6,11 @@ import com.moleculepowered.api.util.ComparableVersion;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * An abstract class used to create a {@link MoleculePlugin} using the bukkit framework
+ *
+ * @author OMGitzFROST
+ */
 public abstract class BukkitPlugin extends JavaPlugin implements MoleculePlugin {
 
     /**

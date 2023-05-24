@@ -13,6 +13,11 @@ public class PlayerAdapter_v1_19_R3 implements PlayerAdapter {
         this.player = player;
     }
 
+    /**
+     * Returns the locale of the adapted player
+     *
+     * @return Player locale
+     */
     @Override
     public String getLocale() {
         return player.getLocale();

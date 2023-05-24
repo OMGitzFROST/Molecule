@@ -23,11 +23,25 @@ public interface User {
     @NotNull String getName();
 
     /**
-     * Sets the username of the user.
+     * Sets the name of the user.
      *
      * @param name the new name for this user
      */
     void setName(@NotNull String name);
+
+    /**
+     * Retrieve the locale assigned to this user object
+     *
+     * @return the user's locale
+     */
+    @NotNull String getLocale();
+
+    /**
+     * Sets the new locale that should be assigned to this user
+     *
+     * @param locale target locale
+     */
+    void setLocale(@NotNull String locale);
 
     /**
      * Retrieve the unique id assigned to this user.

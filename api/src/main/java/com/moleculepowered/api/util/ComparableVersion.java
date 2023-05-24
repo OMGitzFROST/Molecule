@@ -242,11 +242,17 @@ public final class ComparableVersion {
         return 0;
     }
 
+    /*
+    EXTERNAL CLASSES
+     */
+
     /**
      * An enum used to handle all tasks associated with version identifiers, this class
      * parses, defines and returns an identifier based on a provided input.
+     *
+     * @author OMGitzFROST
      */
-    public enum Identifier {
+    private enum Identifier {
 
         ALPHA("a", "alpha"),
         BETA("b", "beta"),

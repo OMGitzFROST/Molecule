@@ -8,6 +8,7 @@ import com.moleculepowered.api.util.ComparableVersion;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -17,6 +18,10 @@ import java.util.function.Predicate;
  * @author OMGitzFROST
  */
 public interface MoleculePlugin extends Manager {
+
+    /*
+    FILE METHODS
+     */
 
     /**
      * Used to return this plugin's data folder
@@ -33,6 +38,18 @@ public interface MoleculePlugin extends Manager {
     default @NotNull File getUserDataFolder() {
         return new File(getDataFolder(), "user-data");
     }
+
+    /**
+     * Returns an internal resource within your jars resource file
+     *
+     * @param resourceName Path to internal resource
+     * @return A resource input stream
+     */
+    InputStream getResource(String resourceName);
+
+    /*
+    DESCRIPTION GETTERS
+     */
 
     /**
      * Returns the name assigned to this plugin
