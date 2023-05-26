@@ -28,73 +28,90 @@
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_19_R3</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_18_R2</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_17_R1</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_16_R3</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_15_R1</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_14_R1</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_13_R2</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_12_R1</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_11_R1</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_10_R1</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_9_R2</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_8_R3</artifactId>
             <version>${project.version}</version>
-            <optional>true</optional>
         </dependency>
     </dependencies>
+
+    <build>
+        <defaultGoal>clean package install javadoc:javadoc</defaultGoal>
+        <plugins>
+            <plugin>
+                <!-- SHADE PLUGIN -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <artifactSet>
+                        <includes>
+                            <include>com.moleculepowered.api:api</include>
+                            <include>com.moleculepowered:*</include>
+                        </includes>
+                    </artifactSet>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

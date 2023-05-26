@@ -1,4 +1,4 @@
-package com.moleculepowered.bukkit;
+package com.moleculepowered.platform.bukkit;
 
 import com.moleculepowered.api.adapter.PlayerAdapter;
 import net.md_5.bungee.api.ChatMessageType;
