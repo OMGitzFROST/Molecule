@@ -2,9 +2,9 @@ package com.moleculepowered.api;
 
 import com.moleculepowered.api.config.ConfigManager;
 import com.moleculepowered.api.model.Manager;
+import com.moleculepowered.api.util.ComparableVersion;
 import com.moleculepowered.api.user.User;
 import com.moleculepowered.api.user.UserManager;
-import com.moleculepowered.api.util.ComparableVersion;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -72,13 +72,14 @@ public interface MoleculePlugin extends Manager {
      */
 
     /**
-     * Returns a user based on the name provided, using a filter system; this method will attempt to locate a
-     * user with the matching name. Otherwise, if a user is not found, this will throw an exception.
+     * <p>Returns a user based on the name provided, using a filter system; this method will attempt to locate a
+     * user with the matching name. Otherwise, if a user is not found, this will throw an exception.</p>
+     *
+     * <p>This method is case-insensitive so any input could return a user</p>
      *
      * @param name Target name
      * @return A user based on the name provided
      * @throws NullPointerException when a user cannot be found with the provided filter.
-     * @apiNote This method is case-insensitive so any input could return a user
      */
     default @NotNull User getUser(String name) {
         return getUserManager().getUser(name);

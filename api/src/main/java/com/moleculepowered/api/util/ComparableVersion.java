@@ -1,14 +1,11 @@
 package com.moleculepowered.api.util;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * <p>The purpose of this class is to create functional version numbers; it will separate
@@ -254,18 +251,33 @@ public final class ComparableVersion {
      */
     private enum Identifier {
 
-        ALPHA("a", "alpha"),
-        BETA("b", "beta"),
+        ALPHA("alpha"),
+        BETA("beta"),
         RELEASE_CANDIDATE("rc"),
         SNAPSHOT("snapshot"),
         PRE_RELEASE("pre"),
         DEVELOPMENTAL("dev"),
         RELEASE;
 
-        private final String[] identifiers;
+        private final String identifier;
 
-        Identifier(String... identifiers) {
-            this.identifiers = identifiers;
+        /**
+         * The main constructor used for this enum, it allows an identifier to be specified for each
+         * enum constant. This constructor will set the identifier to null by default.
+         *
+         */
+        Identifier() {
+            this(null);
+        }
+
+        /**
+         * The main constructor used for this enum, it allows an identifier to be specified for each
+         * enum constant. This constructor allows null values.
+         *
+         * @param identifier Assigned identifier
+         */
+        Identifier(@Nullable String identifier) {
+            this.identifier = identifier;
         }
 
         /**
@@ -278,7 +290,7 @@ public final class ComparableVersion {
          */
         public static Identifier parse(@Nullable String input) {
             return Arrays.stream(Identifier.values())
-                    .filter(identifier -> input != null && identifier.getIdentifiers().contains(input.toLowerCase()))
+                    .filter(value -> input != null && (value.getIdentifier() != null && value.getIdentifier().equalsIgnoreCase(input)))
                     .findFirst()
                     .orElse(Identifier.RELEASE);
         }
@@ -288,18 +300,8 @@ public final class ComparableVersion {
          *
          * @return A list of identifiers
          */
-        public Set<String> getIdentifiers() {
-            return Arrays.stream(identifiers).collect(Collectors.toSet());
-        }
-
-        /**
-         * Used to return the name associated with this identifier
-         *
-         * @return Identifier name
-         */
-        @Contract(pure = true)
-        public @NotNull String getName() {
-            return name();
+        public @Nullable String getIdentifier() {
+            return identifier;
         }
     }
 }
