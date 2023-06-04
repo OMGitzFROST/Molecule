@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.moleculepowered</groupId>
-        <artifactId>Molecule</artifactId>
+        <artifactId>bukkit</artifactId>
         <version>2.0.0</version>
     </parent>
 
-    <artifactId>api</artifactId>
+    <artifactId>bukkit-platform</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -19,10 +19,20 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_19_R3</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_8_R3</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -31,24 +41,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.5.0</version>
-                <configuration>
-                    <source>11</source>
-                    <author>false</author>
-                    <failOnError>false</failOnError>
-                    <doclint>none</doclint>
-                    <links>
-                        <link>https://hub.spigotmc.org/javadocs/spigot</link>
-                    </links>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

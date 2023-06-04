@@ -86,7 +86,7 @@ public final class ComparableVersion {
      * @return Formatted version number
      */
     public @NotNull String getVersion() {
-        return version != null && version.isEmpty() ? version : "0";
+        return version != null && !version.isEmpty() ? version : "0";
     }
 
     /**
@@ -137,7 +137,7 @@ public final class ComparableVersion {
      * @return true if greater than
      */
     public boolean isGreaterThan(@NotNull ComparableVersion version) {
-        return compare(getVersion(), version.getVersion()) == 1;
+        return compare(version.getVersion()) == 1;
     }
 
     /**
@@ -147,7 +147,7 @@ public final class ComparableVersion {
      * @return true if less than
      */
     public boolean isLessThan(@NotNull ComparableVersion version) {
-        return compare(getVersion(), version.getVersion()) == -1;
+        return compare(version.getVersion()) == -1;
     }
 
     /**
@@ -157,7 +157,7 @@ public final class ComparableVersion {
      * @return true if equal
      */
     public boolean isEqual(@NotNull ComparableVersion version) {
-        return compare(getVersion(), version.getVersion()) == 0;
+        return compare(version.getVersion()) == 0;
     }
 
     /*
@@ -209,13 +209,12 @@ public final class ComparableVersion {
      * <p>Below are the results that will be returned and what they mean.</p>
      * <p>(-1) = Less than | (0) = Equal to | (1) = Greater than</p>
      *
-     * @param version1 Original version
-     * @param version2 Target version
+     * @param version Target version
      * @return an integer determining whether its greater, less, or equal to
      */
-    private int compare(@NotNull String version1, @NotNull String version2) {
-        String[] arr1 = version1.split("\\.");
-        String[] arr2 = version2.split("\\.");
+    public int compare(@NotNull String version) {
+        String[] arr1 = getVersion().split("\\.");
+        String[] arr2 = version.split("\\.");
 
         int i = 0;
         while (i < arr1.length || i < arr2.length) {
@@ -237,6 +236,20 @@ public final class ComparableVersion {
             i++;
         }
         return 0;
+    }
+
+    /**
+     * <p>A utility method used to return an integer that will determine whether
+     * the provided versions are greater than, less than, or equal to.</p>
+     *
+     * <p>Below are the results that will be returned and what they mean.</p>
+     * <p>(-1) = Less than | (0) = Equal to | (1) = Greater than</p>
+     *
+     * @param version Target version
+     * @return an integer determining whether its greater, less, or equal to
+     */
+    public int compare(@NotNull ComparableVersion version) {
+        return compare(version.getVersion());
     }
 
     /*

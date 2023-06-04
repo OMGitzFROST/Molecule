@@ -6,13 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 public interface NMSBridge {
 
-    /**
-     * Returns the server version number that will difference nms classes, for example, "v1_8_R3"
-     *
-     * @return Server version
-     */
-    @Nullable String getServerVersion();
-
     /*
     DEFAULT METHODS
      */
@@ -28,8 +21,8 @@ public interface NMSBridge {
      * @param version Target version
      * @return A package pointing to a class version
      */
-    default @NotNull String getPackage(@NotNull Class<?> clazz, @Nullable String version) {
-        return getPackage(clazz.getSimpleName(), version);
+    default @NotNull String getNMSPackage(@NotNull Class<?> clazz, @Nullable String version) {
+        return getNMSPackage(clazz.getSimpleName(), version);
     }
 
     /**
@@ -42,8 +35,8 @@ public interface NMSBridge {
      * @param clazz Target class
      * @return A package pointing to a class version
      */
-    default @NotNull String getPackage(@NotNull Class<?> clazz) {
-        return getPackage(clazz.getSimpleName(), null);
+    default @NotNull String getNMSPackage(@NotNull Class<?> clazz) {
+        return getNMSPackage(clazz.getSimpleName(), null);
     }
 
     /**
@@ -58,7 +51,7 @@ public interface NMSBridge {
      * @param version Target version
      * @return A package pointing to a class version
      */
-    default @NotNull String getPackage(@NotNull String className, @Nullable String version) {
+    default @NotNull String getNMSPackage(@NotNull String className, @Nullable String version) {
         return "com.moleculepowered." + className + (version != null && !version.isEmpty() ? "_" + version : "");
     }
 
@@ -72,7 +65,7 @@ public interface NMSBridge {
      * @param className Target class name
      * @return A package pointing to a class version
      */
-    default @NotNull String getPackage(@NotNull String className) {
-        return getPackage(className, null);
+    default @NotNull String getNMSPackage(@NotNull String className) {
+        return getNMSPackage(className, null);
     }
 }

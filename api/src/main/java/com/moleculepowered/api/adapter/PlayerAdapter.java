@@ -12,6 +12,13 @@ public interface PlayerAdapter {
     String getLocale();
 
     /**
+     * Returns a players current ping
+     *
+     * @return Players ping
+     */
+    int getPing();
+
+    /**
      * Sends the adapted player a action bar in-game
      *
      * @param message Action bar message

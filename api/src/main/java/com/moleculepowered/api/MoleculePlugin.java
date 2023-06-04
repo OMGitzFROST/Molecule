@@ -2,9 +2,11 @@ package com.moleculepowered.api;
 
 import com.moleculepowered.api.config.ConfigManager;
 import com.moleculepowered.api.model.Manager;
-import com.moleculepowered.api.util.ComparableVersion;
+import com.moleculepowered.api.platform.Platform;
+import com.moleculepowered.api.platform.PlatformConsole;
 import com.moleculepowered.api.user.User;
 import com.moleculepowered.api.user.UserManager;
+import com.moleculepowered.api.util.ComparableVersion;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -17,16 +19,35 @@ import java.util.function.Predicate;
  *
  * @author OMGitzFROST
  */
-public interface MoleculePlugin extends Manager {
+public interface MoleculePlugin extends Manager, Platform
+{
+    /*
+    PLATFORM METHODS
+     */
+
+    /**
+     * Returns an enhanced console logger, it features color coded messages (differs between
+     * server environments), as well as customized logging methods (debug, etc)
+     *
+     * @return Platform console
+     */
+    @NotNull PlatformConsole getConsole();
+
+    /**
+     * Returns the platform that this implementation is built on
+     *
+     * @return Implementation platform
+     */
+    @NotNull Platform.Type getPlatform();
 
     /*
     FILE METHODS
      */
 
     /**
-     * Used to return this plugin's data folder
+     * Returns the data folder assigned to your plugin
      *
-     * @return Plugins data folder
+     * @return Plugin data folder
      */
     File getDataFolder();
 

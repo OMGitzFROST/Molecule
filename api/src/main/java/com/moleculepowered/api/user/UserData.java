@@ -11,7 +11,7 @@ import java.io.IOException;
  *
  * @author OMGitzFROST
  */
-public interface UserData {
+public interface UserData<T> {
 
     /**
      * Creates a new user data file if one does not already exist
@@ -39,4 +39,19 @@ public interface UserData {
      * @return User data file
      */
     @NotNull File getFile();
+
+    /**
+     * Returns the data folder where this user's data is stored
+     *
+     * @return User data folder
+     */
+    @NotNull File getDataFolder();
+
+    /**
+     * Returns the configuration assigned to this user, typically this method
+     * features an autoload feature, but can differ between platforms.
+     *
+     * @return User configuration
+     */
+    @NotNull T getConfig();
 }

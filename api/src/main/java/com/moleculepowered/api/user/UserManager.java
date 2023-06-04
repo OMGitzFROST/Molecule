@@ -4,6 +4,8 @@ import com.moleculepowered.api.model.Manager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -13,7 +15,9 @@ import java.util.function.Predicate;
  *
  * @author OMGitzFROST
  */
-public interface UserManager extends Manager {
+public abstract class UserManager implements Manager
+{
+    protected final Set<User> users = new HashSet<>();
 
     /**
      * Adds a new user to the user collection, this method will return true
@@ -22,7 +26,9 @@ public interface UserManager extends Manager {
      * @param user Target user
      * @return true if the user was added without fail
      */
-    boolean addUser(@NotNull User user);
+    public boolean addUser(@NotNull User user) {
+        return users.add(user);
+    }
 
     /**
      * Removes a new user from the user collection, this method will return true
@@ -31,7 +37,9 @@ public interface UserManager extends Manager {
      * @param user Target user
      * @return true if the user was removed without fail
      */
-    boolean removeUser(@NotNull User user);
+    public boolean removeUser(@NotNull User user) {
+        return users.remove(user);
+    }
 
     /**
      * Returns a collection of users handled by this manager. Note that users are NOT
@@ -40,7 +48,9 @@ public interface UserManager extends Manager {
      *
      * @return A collection of users
      */
-    @NotNull Collection<User> getUsers();
+    public @NotNull Collection<User> getUsers() {
+        return users;
+    }
 
     /*
     DEFAULT METHODS
@@ -56,7 +66,7 @@ public interface UserManager extends Manager {
      * @return A user based on the name provided
      * @throws NullPointerException when a user cannot be found with the provided filter.
      */
-    default @NotNull User getUser(String name) {
+    public @NotNull User getUser(String name) {
         return getUser(user -> user.getName().equalsIgnoreCase(name));
     }
 
@@ -68,8 +78,8 @@ public interface UserManager extends Manager {
      * @return A user based on the uuid provided
      * @throws NullPointerException when a user cannot be found with the provided filter.
      */
-    default @NotNull User getUser(UUID uuid) {
-        return getUser(user ->  user.getUniqueId().equals(uuid));
+    public @NotNull User getUser(UUID uuid) {
+        return getUser(user -> user.getUniqueId().equals(uuid));
     }
 
     /**
@@ -80,7 +90,7 @@ public interface UserManager extends Manager {
      * @return A user based on the filter provided
      * @throws NullPointerException when a user cannot be found with the provided filter.
      */
-    default @NotNull User getUser(Predicate<User> filter) {
+    public @NotNull User getUser(Predicate<User> filter) {
         return getUsers().stream().filter(filter).findFirst().orElseThrow(NullPointerException::new);
     }
 }
