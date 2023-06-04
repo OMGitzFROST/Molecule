@@ -1,8 +1,10 @@
-package com.moleculepowered.platform.bukkit.user;
+package com.moleculepowered.platform.bungee.user;
 
 import com.moleculepowered.api.MoleculePlugin;
 import com.moleculepowered.api.user.UserData;
-import org.bukkit.configuration.file.YamlConfiguration;
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.config.ConfigurationProvider;
+import net.md_5.bungee.config.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -17,7 +19,7 @@ import java.util.UUID;
  *
  * @author OMGitzFROST
  */
-public class BukkitUserData extends YamlConfiguration implements UserData {
+public class BungeeUserData implements UserData<Configuration> {
 
     protected final MoleculePlugin plugin;
     private final File userFile;
@@ -35,7 +37,7 @@ public class BukkitUserData extends YamlConfiguration implements UserData {
      * @param plugin Plugin handling the data
      * @param uuid   Target unique id
      */
-    public BukkitUserData(@NotNull MoleculePlugin plugin, @NotNull UUID uuid) {
+    public BungeeUserData(@NotNull MoleculePlugin plugin, @NotNull UUID uuid) {
         this(plugin, "user.yml", uuid);
     }
 
@@ -49,11 +51,11 @@ public class BukkitUserData extends YamlConfiguration implements UserData {
      * @param resourcePath Path to internal resource
      * @param uuid         Target unique id
      */
-    public BukkitUserData(@NotNull MoleculePlugin plugin, @NotNull String resourcePath, @NotNull UUID uuid) {
-        super();
+    public BungeeUserData(@NotNull MoleculePlugin plugin, @NotNull String resourcePath, @NotNull UUID uuid) {
         this.plugin = plugin;
         this.userFile = new File(plugin.getUserDataFolder(), uuid + ".yml");
         RESOURCE = plugin.getResource(resourcePath);
+
     }
 
     /*
@@ -99,22 +101,6 @@ public class BukkitUserData extends YamlConfiguration implements UserData {
     }
 
     /*
-    SETTER METHODS
-     */
-
-    /**
-     * A method used to add the new value into the user's data file.
-     *
-     * @param path  Path to data
-     * @param value Updated value
-     */
-    @Override
-    public void set(String path, Object value) {
-        super.set(path, value);
-        // TODO: 5/22/23 ADD EVENTS, AND FORCE UPDATE TO FILE
-    }
-
-    /*
     GETTER METHODS
      */
 
@@ -126,5 +112,25 @@ public class BukkitUserData extends YamlConfiguration implements UserData {
     @Override
     public @NotNull File getFile() {
         return userFile;
+    }
+
+    /**
+     * Returns the data folder where this user's data is stored
+     *
+     * @return User data folder
+     */
+    @Override
+    public @NotNull File getDataFolder() {
+        return null;
+    }
+
+    @Override
+    public @NotNull Configuration getConfig() {
+        try {
+            return ConfigurationProvider.getProvider(YamlConfiguration.class).load(userFile);
+        }
+        catch (IOException ex) {
+            throw new IllegalArgumentException("Failed to return the bungee configuration object");
+        }
     }
 }
