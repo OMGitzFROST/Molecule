@@ -8,8 +8,13 @@ import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class StringUtil {
-
+/**
+ * Utility class for String-related operations and manipulations.
+ *
+ * @author OMGitzFROST
+ */
+public class StringUtil
+{
     /*
     FORMATTING METHODS
      */
@@ -19,19 +24,51 @@ public final class StringUtil {
      * utilizes number formats such as "{0}" within the string in order to replace it with its
      * assigned value.
      *
-     * @param input Provided input
-     * @param param Optional parameters
-     * @return A formatted string
+     * @param input the provided input
+     * @param param optional parameters
+     * @return a formatted string
      */
     public static String format(String input, Object... param) {
         return input != null ? MessageFormat.format(input, param) : null;
     }
 
-    // TODO: 5/31/23 JAVADOC
+    /**
+     * Strips color codes from a string.
+     *
+     * @param input the input string
+     * @return the input string without color codes
+     */
     public static @NotNull String stripColor(String input) {
         Matcher color = Pattern.compile("[§&]([a-zA-Z0-9])").matcher(StringUtil.nonNull(input));
-        while (color.find()) input = input.replace(color.group(), "");
+        while (color.find()) {
+            input = input.replace(color.group(), "");
+        }
         return input;
+    }
+
+    /**
+     * Used to convert an integer into its corresponding roman numeral
+     *
+     * @param number Target number
+     * @return A roman numeral for the integer
+     */
+    public static @NotNull String intToRoman(int number) {
+        int[] VALUES = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+        String[] SYMBOLS = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+
+        StringBuilder romanNumeral = new StringBuilder();
+        int remaining = number;
+
+        for (int i = 0; i < VALUES.length; i++) {
+            int value = VALUES[i];
+            String symbol = SYMBOLS[i];
+
+            while (remaining >= value) {
+                romanNumeral.append(symbol);
+                remaining -= value;
+            }
+        }
+        return romanNumeral.toString();
     }
 
     /*
@@ -39,50 +76,54 @@ public final class StringUtil {
      */
 
     /**
-     * Used to return a non-null string, this method accomplishes this by checking if the original input
-     * is null, and if so, this method will return the default value provided.
+     * Returns a non-null string. If the original input is null, the default value provided is returned.
      *
-     * @param input Provided input
-     * @param def   Fallback value
-     * @return A non-null string
+     * @param input the provided input
+     * @param def   the fallback value
+     * @return a non-null string
      */
     public static @NotNull String nonNull(@Nullable String input, @NotNull String def) {
         return input != null ? input : def;
     }
 
-    // TODO: 5/28/23 ADD JAVADOC
+    /**
+     * Checks if a string is empty or null.
+     *
+     * @param input the input string
+     * @return true if the string is empty or null, false otherwise
+     */
     public static boolean isEmpty(@Nullable String input) {
-        return input == null || nonNull(input).isEmpty();
+        return input == null || input.isEmpty();
     }
 
     /**
-     * Used to return a non-null string, this method accomplishes this by checking if the original input
-     * is null, and if so, this method will return an empty string.
+     * Returns a non-null string. If the original input is null, an empty string is returned.
      *
-     * @param input Provided input
-     * @return A non-null string
+     * @param input the provided input
+     * @return a non-null string
      */
     public static @NotNull String nonNull(@Nullable String input) {
         return nonNull(input, "");
     }
 
     /**
-     * Used to return a non-null string, this method accomplishes this by checking if the original input
-     * is null, and if so, this method will return an empty string.
+     * Returns a non-null string from a {@link JsonElement}. If the element is null, the default value
+     * is returned.
      *
-     * @param element Provided {@link JsonElement}
-     * @return A non-null string
+     * @param element the provided {@link JsonElement}
+     * @param def     the fallback value
+     * @return a non-null string
      */
     public static @NotNull String nonNull(JsonElement element, String def) {
         return element != null ? element.getAsString() : def;
     }
 
     /**
-     * Used to return a non-null string, this method accomplishes this by checking if the original input
-     * is null, and if so, this method will return an empty string.
+     * Returns a non-null string from a {@link JsonElement}. If the element is null, an empty string
+     * is returned.
      *
-     * @param element Provided {@link JsonElement}
-     * @return A non-null string
+     * @param element the provided {@link JsonElement}
+     * @return a non-null string
      */
     public static @NotNull String nonNull(JsonElement element) {
         return nonNull(element, "");
@@ -93,12 +134,12 @@ public final class StringUtil {
      */
 
     /**
-     * Returns the substring from the last instance of the str.
+     * Returns the substring from the last instance of the provided substring reference.
      *
-     * @param input  Provided input
-     * @param str    Substring reference
-     * @param offset Offset for substring
-     * @return a substring derived from the main input.
+     * @param input  the provided input
+     * @param str    the substring reference
+     * @param offset the offset for the substring
+     * @return a substring derived from the main input
      * @see #lastIndex(String, String)
      */
     public static @NotNull String lastIndex(@NotNull String input, String str, int offset) {
@@ -107,11 +148,11 @@ public final class StringUtil {
     }
 
     /**
-     * Returns the substring from the last instance of the str.
+     * Returns the substring from the last instance of the provided substring reference.
      *
-     * @param input Provided input
-     * @param str   Substring reference
-     * @return a substring derived from the main input.
+     * @param input the provided input
+     * @param str   the substring reference
+     * @return a substring derived from the main input
      * @see #lastIndex(String, String, int)
      */
     public static @NotNull String lastIndex(@NotNull String input, String str) {
@@ -119,12 +160,12 @@ public final class StringUtil {
     }
 
     /**
-     * Returns the substring from the last instance of the str.
+     * Returns the substring from the first instance of the provided substring reference.
      *
-     * @param input  Provided input
-     * @param str    Substring reference
-     * @param offset Offset for substring
-     * @return a substring derived from the main input.
+     * @param input  the provided input
+     * @param str    the substring reference
+     * @param offset the offset for the substring
+     * @return a substring derived from the main input
      * @see #lastIndex(String, String)
      */
     public static @NotNull String substring(@NotNull String input, String str, int offset) {
@@ -133,11 +174,11 @@ public final class StringUtil {
     }
 
     /**
-     * Returns the substring from the last instance of the str.
+     * Returns the substring from the first instance of the provided substring reference.
      *
-     * @param input Provided input
-     * @param str   Substring reference
-     * @return a substring derived from the main input.
+     * @param input the provided input
+     * @param str   the substring reference
+     * @return a substring derived from the main input
      * @see #lastIndex(String, String, int)
      */
     public static @NotNull String substring(@NotNull String input, String str) {
@@ -149,11 +190,11 @@ public final class StringUtil {
      */
 
     /**
-     * Builds a string with the string repeated up to the defined quantity
+     * Builds a string with the input string repeated a specified number of times.
      *
-     * @param s        Desired string
-     * @param quantity Desired number of repeats
-     * @return A new string with the character repeated
+     * @param s        the desired string
+     * @param quantity the desired number of repeats
+     * @return a new string with the character repeated
      */
     public static @NotNull String repeat(String s, int quantity) {
         int currentIndex = 0;
@@ -167,11 +208,11 @@ public final class StringUtil {
     }
 
     /**
-     * Builds a string with the character repeated up to the defined quantity
+     * Builds a string with the character repeated a specified number of times.
      *
-     * @param s        Desired string
-     * @param quantity Desired number of repeats
-     * @return A new string with the character repeated
+     * @param s        the desired string
+     * @param quantity the desired number of repeats
+     * @return a new string with the character repeated
      */
     public static @NotNull String repeat(char s, int quantity) {
         return repeat(String.valueOf(s), quantity);
