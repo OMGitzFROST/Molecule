@@ -1,52 +1,79 @@
 package com.moleculepowered.api.user;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 /**
- * <p>The user interface is designed to simply provide methods that allow developers
- * to update, retrieve and handle user's effectively. The intended use for a user
+ * The user interface is designed to simply provide methods that allow developers
+ * to update, retrieve, and handle users effectively. The intended use for a user
  * is to be handled in an offline setting, in instances where the user information
  * cannot be accessed dynamically, such as using a player object. User information is handled
- * using the storage system delegated by the {@link UserData} interface.</p>
- *
- * @author OMGitzFROST
+ * using the storage system delegated by the {@link com.moleculepowered.api.user.UserData} interface.
  */
-public interface User {
+public interface User extends UserData {
 
     /**
-     * Retrieve the name of assigned to this user object.
+     * Retrieve the unique ID assigned to this user.
+     *
+     * @return the unique ID of this user
+     */
+    @NotNull
+    UUID getUniqueId();
+
+    /**
+     * Retrieve the name assigned to this user object.
      *
      * @return the name of the user
      */
-    @NotNull String getName();
+    @NotNull
+    String getName();
 
     /**
-     * Sets the name of the user.
+     * Retrieve the display name assigned to this user object.
+     * Please note that this value may be different from the name listed.
      *
-     * @param name the new name for this user
+     * @return the display name of the user
      */
-    void setName(@NotNull String name);
+    @Nullable
+    String getDisplayName();
 
     /**
-     * Retrieve the locale assigned to this user object
+     * Retrieve the custom name assigned to this user object.
+     * Please note that this value may be different from the name listed.
+     *
+     * @return the custom name of the user
+     */
+    @Nullable
+    String getCustomName();
+
+    /**
+     * Retrieve the locale assigned to this user object.
      *
      * @return the user's locale
      */
-    @NotNull String getLocale();
+    @Nullable
+    String getLocale();
 
     /**
-     * Sets the new locale that should be assigned to this user
+     * Sets the new display name that should be assigned to this user.
      *
-     * @param locale target locale
+     * @param input the target display name
      */
-    void setLocale(@NotNull String locale);
+    void setDisplayName(@Nullable String input);
 
     /**
-     * Retrieve the unique id assigned to this user.
+     * Sets the new custom name that should be assigned to this user.
      *
-     * @return the unique id of this user
+     * @param input the target custom name
      */
-    @NotNull UUID getUniqueId();
+    void setCustomName(@Nullable String input);
+
+    /**
+     * Sets the new locale that should be assigned to this user.
+     *
+     * @param input the target locale
+     */
+    void setLocale(@NotNull String input);
 }
