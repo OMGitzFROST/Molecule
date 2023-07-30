@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 
 /**
  * A service manager designed to handle all tasks related to user management, allowing developers
- * to retrieve, add, and remove user's from the user collection.
+ * to retrieve, add, and remove users from the user collection.
  *
  * @author OMGitzFROST
  */
@@ -20,10 +20,10 @@ public abstract class UserManager implements Manager
     protected final Set<User> users = new HashSet<>();
 
     /**
-     * Adds a new user to the user collection, this method will return true
-     * if the user was added without failure, otherwise it will return false.
+     * Adds a new user to the user collection. This method returns true if the user was added
+     * without failure, otherwise it returns false.
      *
-     * @param user Target user
+     * @param user the target user
      * @return true if the user was added without fail
      */
     public boolean addUser(@NotNull User user) {
@@ -31,10 +31,10 @@ public abstract class UserManager implements Manager
     }
 
     /**
-     * Removes a new user from the user collection, this method will return true
-     * if the user was removed without failure, otherwise it will return false.
+     * Removes a user from the user collection. This method returns true if the user was removed
+     * without failure, otherwise it returns false.
      *
-     * @param user Target user
+     * @param user the target user
      * @return true if the user was removed without fail
      */
     public boolean removeUser(@NotNull User user) {
@@ -46,7 +46,7 @@ public abstract class UserManager implements Manager
      * loaded into this collection by default but should typically be loaded using the
      * {@link #onEnable()} method.
      *
-     * @return A collection of users
+     * @return a collection of users
      */
     public @NotNull Collection<User> getUsers() {
         return users;
@@ -57,13 +57,13 @@ public abstract class UserManager implements Manager
      */
 
     /**
-     * <p>Returns a user based on the name provided, using a filter system; this method will attempt to locate a
-     * user with the matching name. Otherwise, if a user is not found, this will throw an exception.</p>
+     * Returns a user based on the name provided, using a filter system. This method attempts to locate a
+     * user with the matching name. If a user is not found, it throws an exception.
+     * <p>
+     * This method is case-insensitive, so any input could return a user.
      *
-     * <p>This method is case-insensitive so any input could return a user</p>
-     *
-     * @param name Target name
-     * @return A user based on the name provided
+     * @param name the target name
+     * @return a user based on the name provided
      * @throws NullPointerException when a user cannot be found with the provided filter.
      */
     public @NotNull User getUser(String name) {
@@ -71,11 +71,11 @@ public abstract class UserManager implements Manager
     }
 
     /**
-     * Returns a user based on the uuid provided, using a filter system; this method will attempt to locate a
-     * user with the matching uuid. Otherwise, if a user is not found, this will throw an exception.
+     * Returns a user based on the UUID provided, using a filter system. This method attempts to locate a
+     * user with the matching UUID. If a user is not found, it throws an exception.
      *
-     * @param uuid Target {@link UUID}
-     * @return A user based on the uuid provided
+     * @param uuid the target UUID
+     * @return a user based on the UUID provided
      * @throws NullPointerException when a user cannot be found with the provided filter.
      */
     public @NotNull User getUser(UUID uuid) {
@@ -83,11 +83,11 @@ public abstract class UserManager implements Manager
     }
 
     /**
-     * Return's a user based on a specific filter, please note that this method will not return a null user,
-     * but if it cannot find a user using the provided filter, this method will throw an exception.
+     * Returns a user based on a specific filter. If a user cannot be found using the provided filter,
+     * this method throws an exception.
      *
-     * @param filter User filter
-     * @return A user based on the filter provided
+     * @param filter the user filter
+     * @return a user based on the provided filter
      * @throws NullPointerException when a user cannot be found with the provided filter.
      */
     public @NotNull User getUser(Predicate<User> filter) {
