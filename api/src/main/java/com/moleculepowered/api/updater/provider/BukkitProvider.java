@@ -3,8 +3,8 @@ package com.moleculepowered.api.updater.provider;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.moleculepowered.api.updater.exception.ProviderUnreachableException;
 import com.moleculepowered.api.updater.Updater;
+import com.moleculepowered.api.exception.updater.ProviderUnreachableException;
 import com.moleculepowered.api.updater.network.ProviderConnection;
 import com.moleculepowered.api.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -14,22 +14,23 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 /**
- * <p>This implementation of the {@link AbstractProvider} class was created to strictly
- * handle update checking from the BukkitDev (CurseForge) marketplace.</p>
- *
- * <p>Note that this class itself is not meant to be used on its own or to create an object,
- * but instead intended to be used within the {@link Updater#addProvider(AbstractProvider)} method</p>
+ * This implementation of the {@link AbstractProvider} class was created to strictly
+ * handle update checking from the BukkitDev (CurseForge) marketplace.
+ * <p>
+ * Note that this class itself is not meant to be used on its own or to create an object,
+ * but instead intended to be used within the {@link Updater#addProvider(AbstractProvider)} method.
+ * </p>
  *
  * @author OMGitzFROST
+ * @see AbstractProvider
+ * @see Updater#addProvider(AbstractProvider)
  */
 @SuppressWarnings("unused")
-public class BukkitProvider extends AbstractProvider
-{
-    private final String resourceID, CURSE_FORGE_HOST, DEV_BUKKIT_HOST;
+public class BukkitProvider extends AbstractProvider {
 
-    /*
-    CONSTRUCTOR
-     */
+    private final String resourceID;
+    private final String CURSE_FORGE_HOST;
+    private final String DEV_BUKKIT_HOST;
 
     /**
      * The main constructor for this provider, it initializes the resource id that will be
@@ -44,12 +45,8 @@ public class BukkitProvider extends AbstractProvider
         else throw new IllegalArgumentException("The ID you provide must represent an integer");
 
         this.CURSE_FORGE_HOST = "https://api.curseforge.com/servermods/files?projectIds={0}";
-        this.DEV_BUKKIT_HOST  = "https://dev.bukkit.org/projects/{0}";
+        this.DEV_BUKKIT_HOST = "https://dev.bukkit.org/projects/{0}";
     }
-
-    /*
-    CORE FUNCTIONALITY
-     */
 
     /**
      * {@inheritDoc}
@@ -71,27 +68,20 @@ public class BukkitProvider extends AbstractProvider
 
             // GET UPDATE INFORMATION
             setChangelogLink("https://www.curseforge.com/minecraft/bukkit-plugins/{0}/files/{1}", fileName, fileID);
-        }
-        catch (SocketException | UnknownHostException ex) {
+        } catch (SocketException | UnknownHostException ex) {
             throw new ProviderUnreachableException("An internet connection could not be established, please try again later.");
-        }
-        catch (IndexOutOfBoundsException ex) {
+        } catch (IndexOutOfBoundsException ex) {
             throw new ProviderUnreachableException("An error occurred contacting the project page, perhaps the project id ({0}) is invalid.", resourceID);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             throw new ProviderUnreachableException(ex);
         }
     }
-
-    /*
-    GETTER METHODS
-     */
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public @NotNull String getProviderName() {
+    public @NotNull String getName() {
         return "Bukkit";
     }
 }

@@ -1,6 +1,6 @@
 package com.moleculepowered.api.updater.provider;
 
-import com.moleculepowered.api.updater.exception.ProviderUnreachableException;
+import com.moleculepowered.api.exception.updater.ProviderUnreachableException;
 import com.moleculepowered.api.updater.Updater;
 import com.moleculepowered.api.updater.network.ProviderConnection;
 import org.jetbrains.annotations.NotNull;
@@ -11,26 +11,24 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 /**
- * <p>This implementation of the {@link AbstractProvider} class was created to strictly
- * handle update checking from the SpigotMC marketplace.</p>
+ * This implementation of the {@link AbstractProvider} class was created to strictly
+ * handle update checking from the SpigotMC marketplace.
+ * <p>
+ * Note that this class itself is not meant to be used on its own or to create an object,
+ * but instead intended to be used within the {@link Updater#addProvider(AbstractProvider)} method.
+ * </p>
  *
- * <p>Note that this class itself is not meant to be used on its own or to create an object,
- * but instead intended to be used within the {@link Updater#addProvider(AbstractProvider)} method</p>
- *
+ * @see AbstractProvider
+ * @see Updater#addProvider(AbstractProvider)
  * @author OMGitzFROST
  */
 @SuppressWarnings("unused")
 public class SpigotProvider extends AbstractProvider
 {
-
     private final String resourceID;
 
-    /*
-    CONSTRUCTOR
-     */
-
     /**
-     * The main constructor for this provider, it initializes the resource id that will be used
+     * The main constructor for this provider. It initializes the resource ID that will be used
      * when accessing update information.
      *
      * @param resourceID The ID assigned to your project
@@ -41,10 +39,6 @@ public class SpigotProvider extends AbstractProvider
         else if (resourceID instanceof Number) this.resourceID = resourceID.toString();
         else throw new IllegalArgumentException("The ID you provide must represent an integer");
     }
-
-    /*
-    CORE FUNCTIONALITY
-     */
 
     /**
      * {@inheritDoc}
@@ -69,15 +63,11 @@ public class SpigotProvider extends AbstractProvider
         }
     }
 
-    /*
-    GETTER METHODS
-     */
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public @NotNull String getProviderName() {
+    public @NotNull String getName() {
         return "Spigot";
     }
 }
