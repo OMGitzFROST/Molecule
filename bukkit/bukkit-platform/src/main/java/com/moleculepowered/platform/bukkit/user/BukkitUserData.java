@@ -1,16 +1,26 @@
 package com.moleculepowered.platform.bukkit.user;
 
-import com.moleculepowered.api.user.exception.UserCreateException;
-import com.moleculepowered.api.user.exception.UserDeleteException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.moleculepowered.api.exception.user.UserDeleteException;
 import com.moleculepowered.api.user.UserData;
+import com.moleculepowered.platform.bukkit.adapter.PlayerAdapter;
+import com.moleculepowered.platform.bukkit.event.user.UserCreatedEvent;
+import com.moleculepowered.platform.bukkit.event.user.UserDeletedEvent;
+import com.moleculepowered.platform.bukkit.model.BukkitNMSBridge;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.UUID;
 
 /**
@@ -19,133 +29,208 @@ import java.util.UUID;
  *
  * @author OMGitzFROST
  */
-public class BukkitUserData extends YamlConfiguration implements UserData<YamlConfiguration>
+public class BukkitUserData implements UserData
 {
-    private final InputStream RESOURCE;
-    private final File userDataFolder;
+    // DATA OBJECTS
+    private final Plugin plugin;
+    private final Gson gson;
     private final File userFile;
-    protected final Plugin plugin;
+    private JsonObject config;
+
+    // USER INFORMATION
+    private String name, displayName, customName, locale;
+    private UUID uuid;
 
     /*
     CONSTRUCTORS
      */
 
     /**
-     * Creates a new instance of a user's {@link UserData}, utilizing the plugin handling this data, as
-     * well as the user's unique id, please note that by default this method requires a default user template
-     * named "user.yml" within your jar's resource directory.
+     * <p>The main constructor for the {@link BukkitUserData} class.</p>
      *
-     * @param plugin Plugin handling the data
-     * @param uuid   Target unique id
+     * <p>It's primarily used to initialize all required objects and collect
+     * information from the originating player, this information will be stored
+     * into their respective user file to be later retrieved other plugin's</p>
+     *
+     * @param plugin Parent plugin
+     * @param player Originating player
      */
-    public BukkitUserData(@NotNull Plugin plugin, @NotNull UUID uuid) {
-        this(plugin, "user.yml", uuid);
-    }
+    public BukkitUserData(@NotNull Plugin plugin, @NotNull OfflinePlayer player) {
 
-    /**
-     * Creates a new instance of a user's {@link UserData}, utilizing the plugin handling this data,
-     * as well as the user's unique id, please note that the resource path assigned to this constructor
-     * points to the path where your user template file is located, we will use this when creating new user
-     * files.
-     *
-     * @param plugin       Plugin handling the data
-     * @param resourcePath Path to internal resource
-     * @param uuid         Target unique id
-     */
-    public BukkitUserData(@NotNull Plugin plugin, @NotNull String resourcePath, @NotNull UUID uuid) {
-        super();
         this.plugin = plugin;
-        this.userDataFolder = new File(plugin.getDataFolder(), "user-data");
-        this.userFile = new File(userDataFolder, uuid + ".yml");
-        RESOURCE = plugin.getResource(resourcePath);
+        this.gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+        this.userFile = new File(plugin.getDataFolder() + "/user-data", uuid + ".json");
+
+        // INITIALIZE STATIC USER INFORMATION
+        this.uuid = player.getUniqueId();
+        this.name = player.getName();
+
+        // IF PLAYER IS ONLINE, SET ONLINE SPECIFIC INFORMATION
+        if (player.getPlayer() != null || player instanceof Player) {
+            PlayerAdapter adapter = BukkitNMSBridge.adaptPlayer((Player) player);
+            this.displayName = ((Player) player).getDisplayName();
+            this.customName = ((Player) player).getCustomName();
+            this.locale = adapter.getLocale();
+        }
+        create();
     }
 
-    /*
-    CORE FUNCTIONALITY
-     */
-
     /**
-     * Creates a new user data file if one does not already exist
+     * <p>This method attempts to create a new user data file.</p>
      *
-     * @throws IOException when this method fails to create user data file
+     * <p>By default, this method will not create a user file if one already exists in the
+     * {@link #getDataFolder()}, otherwise this method will create one as usual.
      */
     @Override
-    public void create() throws IOException {
+    public void create() {
+        try {
+            if (!getDataFolder().exists() && !getDataFolder().mkdirs())
+                throw new IllegalArgumentException("Unable to create user data folder");
 
-        // ENSURE DATA FOLDER EXISTS
-        if (!userFile.getParentFile().exists() && !userFile.mkdirs()) throw new UserCreateException(userFile);
+            // ATTEMPT TO CREATE USER FILE IF ONE DOES NOT EXIST, OR IS NULL
+            if (!userFile.exists() || (config != null && config.isJsonNull())) {
+                storeDefaults();
 
-        // CREATE THE FILE IF ONE DOES NOT EXIST
-        if (!userFile.exists()) Files.copy(RESOURCE, userFile.toPath());
+                UserCreatedEvent event = new UserCreatedEvent();
+                plugin.getServer().getPluginManager().callEvent(event);
+            }
+
+            // LOAD USER SETTINGS ONE FILE IS CONFIRMED TO EXIST
+            config = gson.fromJson(new FileReader(userFile), JsonObject.class);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
-     * Deletes a users data file if one exists, otherwise this method will do nothing.
+     * Deletes a user's data file if one exists, otherwise this method will do nothing.
      */
     @Override
-    public void delete(){
-        if (userFile.exists() && !userFile.delete()) throw new UserDeleteException(userFile.getPath());
+    public void delete() {
+
+        // ATTEMPT TO DELETE USER FILE, IF SUCCESSFULL CALL EVENT
+        if (userFile.delete()) {
+            UserDeletedEvent event = new UserDeletedEvent();
+            plugin.getServer().getPluginManager().callEvent(event);
+            return;
+        }
+        throw new UserDeleteException("An error has occurred when trying to delete {0}'s users file", name);
     }
 
     /**
      * Attempts to update a user's data file, usually this method adds new keys to the configuration
      * and attempts to re-add removed comments if applicable.
      *
-     * @throws IOException when this method fails to update a user's data file
+     * @param target Originating player
      */
     @Override
-    public void update() throws IOException {
+    public <T> void update(T target) {
 
+        if (!(target instanceof OfflinePlayer))
+            throw new IllegalArgumentException("In-order to update this user-data, you must provide a valid OfflinePlayer object");
+
+        try {
+            OfflinePlayer player = (OfflinePlayer) target;
+
+            // INITIALIZE STATIC USER INFORMATION
+            this.uuid = player.getUniqueId();
+            this.name = player.getName();
+
+            // IF PLAYER IS ONLINE, SET ONLINE SPECIFIC INFORMATION
+            if (player.getPlayer() != null || player instanceof Player) {
+                PlayerAdapter adapter = BukkitNMSBridge.adaptPlayer((Player) player);
+                this.displayName = ((Player) player).getDisplayName();
+                this.customName = ((Player) player).getCustomName();
+                this.locale = adapter.getLocale();
+            }
+
+            storeDefaults();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
-    /*
-    SETTER METHODS
+    /**
+     * Stores the default information gathered in the constructor into the user's data file.
+     * This method saves the user's data for future retrieval and usage.
+     *
+     * @throws IOException if an I/O error occurs while storing the information into the data file.
+     *                     This can happen if the data file is inaccessible or the storage operation fails.
+     *                     The exception message provides more specific details about the error.
      */
+    private void storeDefaults() throws IOException {
+        JsonObject object = new JsonObject();
+        object.addProperty("uuid", uuid.toString());
+        object.addProperty("name", name);
+        object.addProperty("display-name", displayName);
+        object.addProperty("custom-name", customName);
+        object.addProperty("locale", locale);
+
+        // SAVE DATA TO USER FILE
+        FileWriter writer = new FileWriter(userFile);
+        gson.toJson(object, writer);
+        writer.close();
+    }
 
     /**
-     * A method used to add the new value into the user's data file.
+     * Adds or updates existing data with a new value.
      *
-     * @param path  Path to data
-     * @param value Updated value
+     * <p>Note: The value provided must follow strict guidelines. It must be one of the following data types:
+     * {@link String}, {@link Number}, {@link Boolean}, {@link Character}, or {@link JsonElement}.
+     * Otherwise, this method will throw an {@link IllegalArgumentException}.</p>
+     *
+     * @param key   the target key for the data
+     * @param value the target value to be added or updated
+     * @throws IllegalArgumentException if the provided value is not supported by the method
      */
     @Override
-    public void set(String path, Object value) {
-        super.set(path, value);
-        // TODO: 5/22/23 ADD EVENTS, AND FORCE UPDATE TO FILE
+    public void setData(@NotNull String key, @Nullable Object value) {
+        try {
+            JsonObject oldObject = getData();
+
+            if (value instanceof JsonElement) oldObject.add(key, (JsonElement) value);
+            else oldObject.addProperty(key, String.valueOf(value));
+
+            FileWriter writer = new FileWriter(userFile);
+            gson.toJson(oldObject, writer);
+            writer.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
-    /*
-    GETTER METHODS
+    /**
+     * Retrieves data from a user's data file. If the data key does not exist inside the file,
+     * the provided default value will be returned.
+     *
+     * @param key Data key used to retrieve the data
+     * @param def Default value to be returned if the key is not found
+     * @return The data assigned to the provided key, or the default value if the key is not found
      */
+    @Override
+    public @Nullable String getData(@NotNull String key, @Nullable String def) {
+        if (config == null) create();
+        return getData().get(key) != null && !getData().get(key).isJsonNull() ? getData().get(key).getAsString() : def;
+    }
 
     /**
-     * Return the data file associated with this user
+     * Returns the configuration assigned to this user. The behavior of this method, including autoload
+     * features, may vary between platforms.
      *
-     * @return User data file
+     * @return The user's configuration as a {@link JsonObject}.
+     */
+    @Override
+    public @NotNull JsonObject getData() {
+        return config;
+    }
+
+    /**
+     * Returns the data file associated with this user.
+     *
+     * @return The user's data file as a {@link File} object.
      */
     @Override
     public @NotNull File getFile() {
         return userFile;
-    }
-
-    /**
-     * Returns the data folder where this user's data is stored
-     *
-     * @return User data folder
-     */
-    @Override
-    public @NotNull File getDataFolder() {
-        return userDataFolder;
-    }
-
-    /**
-     * Returns the configuration assigned to this user, typically this method
-     * features an autoload feature, but can differ between platforms.
-     *
-     * @return User configuration
-     */
-    @Override
-    public @NotNull YamlConfiguration getConfig() {
-        return YamlConfiguration.loadConfiguration(userFile);
     }
 }
