@@ -3,318 +3,268 @@ package com.moleculepowered.api.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * <p>The purpose of this class is to create functional version numbers; it will separate
- * each part of its number, such as Major, Minor and make them accessible with easy to use methods.</p>
- *
- * <p>Additionally, this class provides methods that allow you to compare version numbers and check if
- * one is less than, greater than, or equal to its target.</p>
+ * The purpose of this class is to create functional version numbers; it separates
+ * each part of the number, such as major, minor, and makes them accessible with easy-to-use methods.
+ * Additionally, this class provides methods to compare version numbers and check if
+ * one is less than, greater than, or equal to its target.
  *
  * @author OMGitzFROST
  */
 public final class ComparableVersion {
 
-    private String VERSION_PATTERN, MODIFIER_PATTERN;
-    private String version, identifier;
-    private String[] versionParts = {};
+    private String VERSION_PATTERN;
+    private String MODIFIER_PATTERN;
+    private String version;
+    private String identifier;
+    private String[] versionParts;
 
     /**
-     * Used to disable this constructor from being used, this is a utility class
+     * Used to disable the default constructor, as this is a utility class.
      */
     private ComparableVersion() { }
 
     /**
-     * <p>The main constructor for this class, the string input will be used to create a usable
-     * version that can be compared, and broken down into its parts, such as major, minor, patch versions, and
-     * its version type such as BETA, ALPHA, etc.</p>
+     * Constructs a {@code ComparableVersion} object from a string input.
+     * The input string is used to create a usable version that can be compared,
+     * and it is broken down into parts such as major, minor, patch versions, and
+     * a version type such as BETA, ALPHA, etc.
      *
-     * <p>Please note that this method does allow you to provide a null value, this method has built in checks for
-     * that and will return N/A as its value</p>
-     *
-     * @param input Provided input
-     * @see #ComparableVersion(double)
+     * @param input the version string
      */
     public ComparableVersion(@Nullable String input) {
         VERSION_PATTERN = "(?:(\\d+)\\.)?(?:(\\d+)\\.)?(\\*|\\d+)";
         MODIFIER_PATTERN = "BETA|ALPHA|RC|SNAPSHOT";
 
         if (input != null) {
-
-            // SET VERSION NUMBER
+            // Set version number
             Matcher versionMatch = parseVersion(input);
             if (versionMatch.find()) version = versionMatch.group();
 
-            // SET VERSION TYPE
+            // Set version type
             Matcher identifierMatch = parseIdentifier(input);
             if (identifierMatch.find()) identifier = identifierMatch.group();
 
-            // SPLIT THE VERSION INTO PARTS
+            // Split the version into parts
             versionParts = version.split("\\.");
         }
     }
 
     /**
-     * <p>The main constructor for this class, the string input will be used to create a usable
-     * version that can be compared, and broken down into its parts, such as major, minor, patch versions, and
-     * its version type such as BETA, ALPHA, etc.</p>
+     * Constructs a {@code ComparableVersion} object from a double input.
+     * The double value is converted to a string and used to create a usable version
+     * that can be compared, and it is broken down into parts such as major, minor,
+     * patch versions, and a version type such as BETA, ALPHA, etc.
      *
-     * <p>Please note that this method does allow you to provide a null value, this method has built in checks for
-     * that and will return N/A as its value</p>
-     *
-     * @param input Provided input
+     * @param input the version number as a double
      * @see #ComparableVersion(String)
      */
     public ComparableVersion(double input) {
         this(String.valueOf(input));
     }
 
-    /*
-    VERSION PARTS
-     */
-
     /**
-     * <p>Used to return the version number parsed by this class, please note that this
-     * method doesn't return the original full version number.</p>
+     * Returns the version number parsed by this class. Please note that this
+     * method doesn't return the original full version number.
+     * If there was an error parsing the version number with the input provided,
+     * this method will return "0" by default.
      *
-     * <p>If there was an error parsing the version number with the input provided,
-     * this method will return "0.0" by default.</p>
-     *
-     * @return Formatted version number
+     * @return the formatted version number
      */
-    public @NotNull String getVersion() {
+    @Override
+    public String toString() {
         return version != null && !version.isEmpty() ? version : "0";
     }
 
     /**
-     * A method used to return the pre-release type such as BETA, ALPHA, etc. If an identifier
-     * was not parsed correctly, this method will return {@link Identifier#RELEASE} by default.
+     * Returns the version identifier (modifier) for this version.
+     * If an identifier was not parsed correctly, this method will return
+     * {@link Identifier#RELEASE} by default.
      *
-     * @return Version modifier
+     * @return the version identifier
      */
     public @NotNull Identifier getIdentifier() {
         return Identifier.parse(identifier);
     }
 
     /**
-     * Returns the major release for this version, if this version doesn't have one, this method will return as 0
+     * Returns the major release for this version.
+     * If this version doesn't have a major release, this method will return 0.
      *
-     * @return Major release
+     * @return the major release
      */
     public int getMajor() {
         return versionParts.length >= 1 ? Integer.parseInt(versionParts[0]) : 0;
     }
 
     /**
-     * Returns the minor release for this version, if this version doesn't have one, this method will return as 0
+     * Returns the minor release for this version.
+     * If this version doesn't have a minor release, this method will return 0.
      *
-     * @return Minor release
+     * @return the minor release
      */
     public int getMinor() {
         return versionParts.length >= 2 ? Integer.parseInt(versionParts[1]) : 0;
     }
 
     /**
-     * Returns the patch release for this version, if this version doesn't have one, this method will return as 0
+     * Returns the patch release for this version.
+     * If this version doesn't have a patch release, this method will return 0.
      *
-     * @return Patch release
+     * @return the patch release
      */
     public int getPatch() {
         return versionParts.length >= 3 ? Integer.parseInt(versionParts[2]) : 0;
     }
 
-    /*
-    COMPARATIVE METHODS
-     */
-
     /**
-     * Returns true if the compared version is greater than this version
+     * Compares this version to another version. Returns a negative integer, zero, or a positive integer
+     * as this version is less than, equal to, or greater than the specified version.
      *
-     * @param version Target version
-     * @return true if greater than
+     * @param target the version to compare to
+     * @return the comparison result
      */
-    public boolean isGreaterThan(@NotNull ComparableVersion version) {
-        return compare(version.getVersion()) == 1;
-    }
+    public int compareTo(@NotNull ComparableVersion target) {
+        int[] thisParts = toIntArray(versionParts);
+        int[] thatParts = toIntArray(target.versionParts);
+        int length = Math.max(thisParts.length, thatParts.length);
 
-    /**
-     * Returns true if the compared version is less than this version
-     *
-     * @param version Target version
-     * @return true if less than
-     */
-    public boolean isLessThan(@NotNull ComparableVersion version) {
-        return compare(version.getVersion()) == -1;
-    }
-
-    /**
-     * Returns true if the compared version is equal to this version
-     *
-     * @param version Target version
-     * @return true if equal
-     */
-    public boolean isEqual(@NotNull ComparableVersion version) {
-        return compare(version.getVersion()) == 0;
-    }
-
-    /*
-    DESCRIPTION METHODS
-     */
-
-    /**
-     * Returns whether this version is considered an unstable build; this is determined by the modifier
-     * that was associated with the original version number; examples of unstable builds are "BETA", "ALPHA",
-     * "Release Candidate (RC), and "SNAPSHOT" builds.
-     *
-     * @return true if this version is unstable
-     */
-    public boolean isUnstable() {
-        return getIdentifier() != Identifier.RELEASE;
-    }
-
-    /*
-    UTILITY METHODS
-     */
-
-    /**
-     * A utility method used to return a parsed version number derived from the provided string. Please
-     * note that if this the provided input is null, this method will return an empty string
-     *
-     * @param input Provided input
-     * @return The version modifier or a null string
-     */
-    private @NotNull Matcher parseVersion(String input) {
-        return Pattern.compile(VERSION_PATTERN, Pattern.CASE_INSENSITIVE).matcher(input);
-    }
-
-    /**
-     * A utility method used to return a parsed modifier derived from a version string, these
-     * modifiers include BETA, ALPHA, RELEASE CANDIDATE, ETC. Please note that if the provided string is
-     * null, this method will return a null string.
-     *
-     * @param input Provided input
-     * @return The version modifier or an empty string
-     */
-    private @NotNull Matcher parseIdentifier(String input) {
-        return Pattern.compile(MODIFIER_PATTERN, Pattern.CASE_INSENSITIVE).matcher(input);
-    }
-
-    /**
-     * <p>A utility method used to return an integer that will determine whether
-     * the provided versions are greater than, less than, or equal to.</p>
-     *
-     * <p>Below are the results that will be returned and what they mean.</p>
-     * <p>(-1) = Less than | (0) = Equal to | (1) = Greater than</p>
-     *
-     * @param version Target version
-     * @return an integer determining whether its greater, less, or equal to
-     */
-    public int compare(@NotNull String version) {
-        String[] arr1 = getVersion().split("\\.");
-        String[] arr2 = version.split("\\.");
-
-        int i = 0;
-        while (i < arr1.length || i < arr2.length) {
-            if (i < arr1.length && i < arr2.length) {
-                if (Integer.parseInt(arr1[i]) < Integer.parseInt(arr2[i])) {
-                    return -1;
-                } else if (Integer.parseInt(arr1[i]) > Integer.parseInt(arr2[i])) {
-                    return 1;
-                }
-            } else if (i < arr1.length) {
-                if (Integer.parseInt(arr1[i]) != 0) {
-                    return 1;
-                }
-            } else {
-                if (Integer.parseInt(arr2[i]) != 0) {
-                    return -1;
-                }
-            }
-            i++;
+        for (int i = 0; i < length; i++) {
+            int thisPart = (i < thisParts.length) ? thisParts[i] : 0;
+            int thatPart = (i < thatParts.length) ? thatParts[i] : 0;
+            if (thisPart < thatPart) return -1;
+            if (thisPart > thatPart) return 1;
         }
+
+        // Compare version identifiers (modifiers) if present
+        if (identifier != null && target.identifier != null) {
+            Identifier thisIdentifier = Identifier.parse(identifier);
+            Identifier thatIdentifier = Identifier.parse(target.identifier);
+            return thisIdentifier.compareTo(thatIdentifier);
+        } else if (identifier != null) {
+            return 1;
+        } else if (target.identifier != null) {
+            return -1;
+        }
+
         return 0;
     }
 
     /**
-     * <p>A utility method used to return an integer that will determine whether
-     * the provided versions are greater than, less than, or equal to.</p>
+     * Checks if this version is less than the specified target version.
      *
-     * <p>Below are the results that will be returned and what they mean.</p>
-     * <p>(-1) = Less than | (0) = Equal to | (1) = Greater than</p>
-     *
-     * @param version Target version
-     * @return an integer determining whether its greater, less, or equal to
+     * @param target the version to compare to
+     * @return {@code true} if this version is less than the target version, {@code false} otherwise
      */
-    public int compare(@NotNull ComparableVersion version) {
-        return compare(version.getVersion());
+    public boolean isLessThan(@NotNull ComparableVersion target) {
+        return compareTo(target) < 0;
     }
 
-    /*
-    EXTERNAL CLASSES
+    /**
+     * Checks if this version is greater than the specified target version.
+     *
+     * @param target the version to compare to
+     * @return {@code true} if this version is greater than the target version, {@code false} otherwise
      */
+    public boolean isGreaterThan(@NotNull ComparableVersion target) {
+        return compareTo(target) > 0;
+    }
 
     /**
-     * An enum used to handle all tasks associated with version identifiers, this class
-     * parses, defines and returns an identifier based on a provided input.
+     * Checks if this version is equal to the specified target version.
+     *
+     * @param target the version to compare to
+     * @return {@code true} if this version is equal to the target version, {@code false} otherwise
+     */
+    public boolean isEqualTo(@NotNull ComparableVersion target) {
+        return compareTo(target) == 0;
+    }
+
+    /**
+     * Checks if this version is considered unstable, based on the identifier (modifier).
+     * An unstable version usually contains an identifier like BETA, ALPHA, or RC.
+     *
+     * @return {@code true} if the version is unstable, {@code false} otherwise
+     */
+    public boolean isUnstable() {
+        return identifier != null && getIdentifier().isUnstable();
+    }
+
+    /**
+     * Parses the version number from the input string using a regular expression pattern.
+     *
+     * @param input the input string
+     * @return the matcher object containing the version number
+     */
+    private @NotNull Matcher parseVersion(String input) {
+        Pattern pattern = Pattern.compile(VERSION_PATTERN);
+        return pattern.matcher(input);
+    }
+
+    /**
+     * Parses the version identifier (modifier) from the input string using a regular expression pattern.
+     *
+     * @param input the input string
+     * @return the matcher object containing the version identifier
+     */
+    private @NotNull Matcher parseIdentifier(String input) {
+        Pattern pattern = Pattern.compile(MODIFIER_PATTERN, Pattern.CASE_INSENSITIVE);
+        return pattern.matcher(input);
+    }
+
+    /**
+     * Converts an array of strings to an array of integers.
+     *
+     * @param versionParts the array of strings
+     * @return the array of integers
+     */
+    private int @NotNull [] toIntArray(String @NotNull [] versionParts) {
+        int[] result = new int[versionParts.length];
+        for (int i = 0; i < versionParts.length; i++) {
+            result[i] = Integer.parseInt(versionParts[i]);
+        }
+        return result;
+    }
+
+    /**
+     * The possible version identifiers (modifiers) for a version.
      *
      * @author OMGitzFROST
      */
-    private enum Identifier {
-
-        ALPHA("alpha"),
-        BETA("beta"),
-        RELEASE_CANDIDATE("rc"),
-        SNAPSHOT("snapshot"),
-        PRE_RELEASE("pre"),
-        DEVELOPMENTAL("dev"),
-        RELEASE;
-
-        private final String identifier;
+    public enum Identifier {
+        RELEASE,
+        SNAPSHOT,
+        ALPHA,
+        BETA,
+        RC;
 
         /**
-         * The main constructor used for this enum, it allows an identifier to be specified for each
-         * enum constant. This constructor will set the identifier to null by default.
+         * Parses a string to an Identifier enum value.
+         * If the input string doesn't match any valid identifier,
+         * the default identifier {@link Identifier#RELEASE} is returned.
          *
+         * @param identifier the identifier string
+         * @return the parsed identifier enum value
          */
-        Identifier() {
-            this(null);
+        public static Identifier parse(@NotNull String identifier) {
+            try {
+                return Identifier.valueOf(identifier.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return RELEASE;
+            }
         }
 
         /**
-         * The main constructor used for this enum, it allows an identifier to be specified for each
-         * enum constant. This constructor allows null values.
+         * Checks if the identifier is considered unstable.
+         * An unstable identifier usually represents a pre-release version.
          *
-         * @param identifier Assigned identifier
+         * @return {@code true} if the identifier is unstable, {@code false} otherwise
          */
-        Identifier(@Nullable String identifier) {
-            this.identifier = identifier;
-        }
-
-        /**
-         * Used to parse a string into a usable version {@link Identifier}, please note
-         * that if an identifier cannot be derived by the provided input, this
-         * method will return {@link #RELEASE} by default.
-         *
-         * @param input Provided input
-         * @return An identifier or {@link #RELEASE} by default.
-         */
-        public static Identifier parse(@Nullable String input) {
-            return Arrays.stream(Identifier.values())
-                    .filter(value -> input != null && (value.getIdentifier() != null && value.getIdentifier().equalsIgnoreCase(input)))
-                    .findFirst()
-                    .orElse(Identifier.RELEASE);
-        }
-
-        /**
-         * A utility method that returns all identifiers associated with this constant.
-         *
-         * @return A list of identifiers
-         */
-        public @Nullable String getIdentifier() {
-            return identifier;
+        public boolean isUnstable() {
+            return this != RELEASE;
         }
     }
 }
