@@ -1,4 +1,0 @@
-main: com.moleculepowered.testplugin.bukkit.TestPlugin
-name: TestPlugin
-version: 0.1.0
-api-version: 1.13
