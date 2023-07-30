@@ -6,13 +6,17 @@ import org.jetbrains.annotations.Nullable;
 import java.text.MessageFormat;
 
 /**
- * A utility class designed to simply handle translations. All core functions of this class are
- * accessed as static methods. Additionally, constructors are disabled for this class.
+ * A utility class designed to handle translations. All core functions of this class are
+ * accessed as static methods. Constructors are disabled for this class.
+ *
+ * <p>Use this class as a static utility for handling translations without the need for instantiation.</p>
+ *
+ * <p>Localization can be achieved by setting a translator using the {@link #setTranslator(Translator)} method.</p>
  *
  * @author OMGitzFROST
  */
-public final class i18n {
-
+public final class i18n
+{
     private static i18n instance;
     private Translator translator;
 
@@ -21,9 +25,14 @@ public final class i18n {
      */
 
     /**
-     * The main constructor used to initialize all required objects for this class.
+     * Constructs an instance of the `i18n` class. (Private constructor)
+     *
+     * <p>This constructor initializes the default translator, which uses the key as the default translation.
+     * As a result, all messages inputted will display as provided by default.</p>
+     *
+     * <p>To enable localization, use the {@link #setTranslator(Translator)} method.</p>
      */
-    i18n() {
+    private i18n() {
         translator = key -> key;
     }
 
@@ -32,23 +41,22 @@ public final class i18n {
      */
 
     /**
-     * Used to set the translator that will be used for our translation methods
+     * Sets the translator to be used for translation methods.
      *
-     * @param translator Functional translator
+     * @param translator The functional translator
      */
     public static void setTranslator(@Nullable Translator translator) {
         getInstance().translator = translator;
     }
 
     /**
-     * <p>Returns a localized message utilizing the defined translator.</p>
+     * Translates the given key into a localized message using the defined translator.
      *
-     * <p>A translator must be defined prior to using this method, to define a translator
-     * consider using the {@link #setTranslator(Translator)} method.</p>
+     * <p>Prior to using this method, ensure that a translator is defined using the {@link #setTranslator(Translator)} method.</p>
      *
-     * @param key   Translation key
-     * @param param Optional parameters
-     * @return A localized message
+     * @param key   The translation key
+     * @param param Optional parameters for message interpolation
+     * @return The localized message
      * @see #translate(String, Object...)
      */
     public static @NotNull String tl(String key, Object... param) {
@@ -60,14 +68,13 @@ public final class i18n {
      */
 
     /**
-     * <p>Returns a localized message utilizing the defined translator.</p>
+     * Translates the given key into a localized message using the defined translator.
      *
-     * <p>A translator must be defined prior to using this method, to define a translator
-     * consider using the {@link #setTranslator(Translator)} method.</p>
+     * <p>Prior to using this method, ensure that a translator is defined using the {@link #setTranslator(Translator)} method.</p>
      *
-     * @param key   Translation key
-     * @param param Optional parameters
-     * @return A localized message
+     * @param key   The translation key
+     * @param param Optional parameters for message interpolation
+     * @return The localized message
      * @see #tl(String, Object...)
      */
     private String translate(String key, Object... param) {
@@ -79,11 +86,11 @@ public final class i18n {
     }
 
     /**
-     * A utility method used to return an instance of this class, it enabled easy access to non-static
-     * objects and methods. Please note that this method has a built-in check to initialize the
-     * {@link #instance} variable, if its null it initializes it.
+     * Returns an instance of the `i18n` class, enabling access to non-static objects and methods.
      *
-     * @return An instance of this class
+     * <p>This method initializes the {@link #instance} variable if it is null.</p>
+     *
+     * @return An instance of the `i18n` class
      */
     private static i18n getInstance() {
         if (instance == null) instance = new i18n();
