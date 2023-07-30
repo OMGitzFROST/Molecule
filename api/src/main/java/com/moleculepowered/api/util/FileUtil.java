@@ -10,34 +10,39 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * A utility class for file-related operations.
+ *
+ * @author OMGitzFROST
+ */
 public final class FileUtil
 {
 
     /**
-     * Used to return the file name from a string input and will include its file extension
+     * Returns the file name from a string input, including its file extension.
      *
-     * @param input Provided input
-     * @return The file name from a string path
+     * @param input the provided input
+     * @return the file name from the string path
      */
     public static @NotNull String getFileName(@NotNull String input) {
         return getFileName(Paths.get(input));
     }
 
     /**
-     * Used to return the file name from a file input and will include its file extension
+     * Returns the file name from a file input, including its file extension.
      *
-     * @param input Provided input
-     * @return The file name from a string path
+     * @param input the provided input
+     * @return the file name from the file path
      */
     public static @NotNull String getFileName(@NotNull File input) {
         return getFileName(input.toPath());
     }
 
     /**
-     * Used to return the file name from a path input and will include its file extension
+     * Returns the file name from a path input, including its file extension.
      *
-     * @param input Provided input
-     * @return The file name from a string path
+     * @param input the provided input
+     * @return the file name from the path
      */
     public static @NotNull String getFileName(@NotNull Path input) {
         return input.getFileName().toString();
@@ -48,11 +53,11 @@ public final class FileUtil
      */
 
     /**
-     * A shorthand method designed to copy a resource from an input stream and into the requested file
-     * location, By default, this method will not replace an existing file.
+     * Copies a resource from an input stream to the requested file location. By default, this method
+     * does not replace an existing file.
      *
-     * @param in       Target input stream
-     * @param location Target location
+     * @param in       the target input stream
+     * @param location the target location
      * @see #copy(InputStream, File, boolean)
      */
     public static void copy(@NotNull InputStream in, @NotNull File location) {
@@ -60,12 +65,12 @@ public final class FileUtil
     }
 
     /**
-     * A shorthand method designed to copy a resource from an input stream and into the requested file
-     * location, This method allows you to define whether existing files should be replaced or not.
+     * Copies a resource from an input stream to the requested file location. This method allows
+     * you to specify whether existing files should be replaced or not.
      *
-     * @param in       Target input stream
-     * @param location Target location
-     * @param replace  Whether existing files should be replaced
+     * @param in       the target input stream
+     * @param location the target location
+     * @param replace  whether existing files should be replaced
      * @see #copy(InputStream, File)
      */
     public static void copy(@NotNull InputStream in, @NotNull File location, boolean replace) {
@@ -74,33 +79,34 @@ public final class FileUtil
                 throw new IOException("Failed to create parent directory for " + location.getName());
             }
 
-            if (replace) Files.copy(in, location.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            else Files.copy(in, location.toPath());
-        }
-        catch (IOException ex) {
+            if (replace) {
+                Files.copy(in, location.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                Files.copy(in, location.toPath());
+            }
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
     /**
-     * <p>Used to save an internal resource to the specified location. <b>By default, this method will
-     * overwrite existing files</b>
+     * Saves an internal resource to the specified location. By default, this method overwrites
+     * existing files.
      *
-     * @param input    Target resource path
-     * @param location Target location
+     * @param input    the target resource path
+     * @param location the target location
      */
     public static void saveResource(InputStream input, File location) {
         saveResource(input, location, true);
     }
 
     /**
-     * Used to save an internal resource to the specified location, with this method you can
-     * specify whether we should override an existing file by setting the boolean parameter
-     * to true, otherwise set the value to false.
+     * Saves an internal resource to the specified location. You can specify whether to overwrite
+     * an existing file by setting the boolean parameter to true, otherwise set it to false.
      *
-     * @param input    Target input stream
-     * @param location Target location
-     * @param replace  Whether we should overwrite existing files
+     * @param input    the target input stream
+     * @param location the target location
+     * @param replace  whether to overwrite existing files
      */
     public static void saveResource(InputStream input, File location, boolean replace) {
         copy(input, location, replace);
