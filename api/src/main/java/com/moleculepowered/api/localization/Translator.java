@@ -1,7 +1,8 @@
 package com.moleculepowered.api.localization;
 
 /**
- * A functional interface tasked with handling translations for the {@link i18n} class.
+ * This functional interface is responsible for handling translations for the {@link i18n} class.
+ * It can be implemented to provide custom translation logic.
  *
  * @author OMGitzFROST
  */
@@ -9,10 +10,10 @@ package com.moleculepowered.api.localization;
 public interface Translator {
 
     /**
-     * A method used to convert the provided key into a translated key.
+     * Converts the provided key into a translated key.
      *
-     * @param key Target key
-     * @return a translated key
+     * @param key The target key to be translated
+     * @return The translated key
      */
     String translate(String key);
 }
