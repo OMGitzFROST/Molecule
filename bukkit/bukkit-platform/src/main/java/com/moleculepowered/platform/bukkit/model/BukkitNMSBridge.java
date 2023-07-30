@@ -1,9 +1,7 @@
 package com.moleculepowered.platform.bukkit.model;
 
-import com.moleculepowered.api.adapter.HoverAdapter;
-import com.moleculepowered.api.adapter.PlayerAdapter;
-import com.moleculepowered.api.model.NMSBridge;
-import net.md_5.bungee.api.chat.HoverEvent;
+import com.moleculepowered.platform.bukkit.adapter.HoverAdapter;
+import com.moleculepowered.platform.bukkit.adapter.PlayerAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -11,54 +9,52 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
+import java.util.Arrays;
 
 /**
- * <p>A utility class designed to build and return classes that enable your plugin to work
- * across multiple server versions. This class uses Java's reflection api to achieve this outcome.</p>
+ * A utility class designed to build and return classes that enable your plugin to work
+ * across multiple server versions. This class uses Java's reflection API to achieve this outcome.
  *
  * @author OMGitzFROST
  */
-public final class BukkitNMSBridge implements NMSBridge
+public final class BukkitNMSBridge
 {
     private static final String packagePrefix = "com.moleculepowered.platform.bukkit.";
-    private static BukkitNMSBridge instance;
 
     /*
     ADAPTING METHODS
      */
 
     /**
-     * Returns a {@link PlayerAdapter} bound to the provided player object
+     * Returns a {@link PlayerAdapter} bound to the provided player object.
      *
-     * @param player Provided player
-     * @return A bounded {@link PlayerAdapter}
+     * @param player the provided player
+     * @return a bounded {@link PlayerAdapter}
      */
     public static @NotNull PlayerAdapter adaptPlayer(@NotNull Player player) {
         try {
             Class<?> classDefinition = Class.forName(packagePrefix + getServerVersion() + ".adapter.PlayerAdapter");
             Constructor<?> cons = classDefinition.getConstructor(Player.class);
             return (PlayerAdapter) cons.newInstance(player);
-        }
-        catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
-            throw new IllegalArgumentException("Failed to create player adapter using the provided player object", ex);
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException ex) {
+            throw new IllegalArgumentException("Failed to create a player adapter using the provided player object", ex);
         }
     }
 
     /**
-     * Returns a {@link HoverAdapter} bounded for the current server implementation
+     * Returns a {@link HoverAdapter} bound for the current server implementation.
      *
-     * @return A bounded {@link HoverAdapter}
+     * @return a bounded {@link HoverAdapter}
      */
-    @SuppressWarnings("unchecked")
-    public static @NotNull HoverAdapter<HoverEvent> adaptHover() {
+    public static @NotNull HoverAdapter adaptHover() {
         try {
             Class<?> clazz = Class.forName(packagePrefix + getServerVersion() + ".adapter.HoverAdapter");
             Constructor<?> cons = clazz.getConstructor();
-            return (HoverAdapter<HoverEvent>) cons.newInstance();
-        }
-        catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ex) {
-            throw new IllegalArgumentException("Failed to create hover adapter using the provided config object", ex);
+            return (HoverAdapter) cons.newInstance();
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException ex) {
+            throw new IllegalArgumentException("Failed to create a hover adapter using the provided config object", ex);
         }
     }
 
@@ -67,21 +63,50 @@ public final class BukkitNMSBridge implements NMSBridge
      */
 
     /**
-     * Returns the version number that will difference nms classes, for example, "v1_8_R3"
+     * Returns the version number that will differentiate NMS classes, for example, "v1_8_R3".
      *
-     * @return Server version
+     * @return the server version
      */
     public static @Nullable String getServerVersion() {
-        return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+        return ServerVersion.parse(Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3]);
     }
 
     /**
-     * Returns an instance of the {@link BukkitNMSBridge} class
-     *
-     * @return Class instance
+     * A private enum used to handle parsing server versions and retrieving them.
      */
-    private static @NotNull NMSBridge getInstance() {
-        if (instance == null) instance = new BukkitNMSBridge();
-        return Objects.requireNonNull(instance);
+    private enum ServerVersion
+    {
+
+        v1_20_R1,
+        v1_19_R3,
+        v1_18_R2,
+        v1_17_R1,
+        v1_16_R3,
+        v1_15_R1,
+        v1_14_R1,
+        v1_13_R2,
+        v1_12_R1,
+        v1_11_R1,
+        v1_10_R1,
+        v1_9_R3,
+        v1_8_R3;
+
+        /**
+         * Parses a {@link ServerVersion} from the version string provided
+         *
+         * @param input Target version string
+         * @return A {@link ServerVersion}
+         * @throws IllegalArgumentException When a server version failed to parse
+         */
+        public static String parse(String input) {
+            if (input == null) return null;
+
+            String adjustedVersion = input.replace(input.substring(input.lastIndexOf("_")), "");
+            return Arrays.stream(ServerVersion.values())
+                    .filter(version -> version.name().contains(adjustedVersion))
+                    .findFirst()
+                    .map(ServerVersion::name)
+                    .orElseThrow(IllegalArgumentException::new);
+        }
     }
 }
