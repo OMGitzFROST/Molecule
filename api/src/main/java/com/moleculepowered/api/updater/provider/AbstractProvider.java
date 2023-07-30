@@ -6,10 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -62,7 +58,7 @@ public abstract class AbstractProvider
      *
      * @return The provider's name
      */
-    public @NotNull String getProviderName() {
+    public @NotNull String getName() {
         return getClass().getSimpleName().replace("Provider", "");
     }
 
@@ -253,31 +249,5 @@ public abstract class AbstractProvider
      */
     protected final void setLatestVersion(@Nullable String version) {
         this.latestVersion = new ComparableVersion(version);
-    }
-
-    /*
-    UTILITY METHOD
-     */
-
-    /**
-     * <p>Creates a usable {@link HttpURLConnection} from a string. By default, this method
-     * will apply its own user agent, follow redirects and connect once the connection is created.
-     * We suggest closing this connection at the end of your try-catch block using the
-     * {@link HttpURLConnection#disconnect()} method.
-     *
-     * @param url   The external url
-     * @param param Optional parameters to be injected in the url
-     * @return A {@link HttpURLConnection}
-     * @throws IOException when the connection failed to create
-     */
-    protected final @NotNull HttpURLConnection conn(String url, Object... param) throws IOException {
-        URL targetURL = new URL(format(url, Arrays.stream(param).map(String::valueOf).toArray()));
-        HttpURLConnection conn = (HttpURLConnection) targetURL.openConnection();
-        conn.addRequestProperty("User-Agent", "MoleculeAPI/Spigot");
-        conn.setInstanceFollowRedirects(true);
-        conn.setReadTimeout(30000);
-        conn.setDoOutput(true);
-        conn.connect();
-        return conn;
     }
 }
