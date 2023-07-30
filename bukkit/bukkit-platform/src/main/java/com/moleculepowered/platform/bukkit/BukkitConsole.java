@@ -1,6 +1,6 @@
 package com.moleculepowered.platform.bukkit;
 
-import com.moleculepowered.api.platform.PlatformConsole;
+import com.moleculepowered.api.Console;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -8,12 +8,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 
 /**
- * A bukkit implementation for the {@link PlatformConsole} class, it provides
+ * A bukkit implementation for the {@link Console} class, it provides
  * platform-specific methods that further extend the console platform.
  *
  * @author OMGitzFROST
  */
-public final class BukkitConsole extends PlatformConsole
+public final class BukkitConsole extends Console
 {
     /*
     CONSTRUCTORS
