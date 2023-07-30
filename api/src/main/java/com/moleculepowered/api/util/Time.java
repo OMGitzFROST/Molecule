@@ -17,13 +17,19 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * A utility class that provides a variety of methods related to Time, Dates, etc.
+ * A utility class that provides various methods for handling time and dates.
+ *
+ * <p>This class offers a set of useful methods for performing operations related
+ * to time, dates, and other related functionalities.</p>
+ *
+ * <p>For example, it provides methods for converting between different time formats,
+ * calculating time differences, and manipulating dates.</p>
  *
  * @author OMGitzFROST
- * @since 1.0.0
  */
-public final class Time {
-
+@SuppressWarnings("unused")
+public final class Time
+{
     private static final String DEFAULT_DATE_FORMAT = "MM/dd/yyy";
 
     /*
@@ -31,73 +37,71 @@ public final class Time {
      */
 
     /**
-     * <p>Adds a specified amount of time to the start date, please note that this method does require
-     * a specific format to be entered as its input, That format is as follows "[#][unit]", for example "2h".</p>
+     * Adds a specified amount of time to the start date.
      *
-     * <p>With that input, it will tell this method to add 2 hours to the provided date, please take a look at
-     * the table below for all available unit abbreviations that are accepted by this method</p>
+     * <p>This method requires a specific input format: "[#][unit]". For example, "2h" adds 2 hours to the provided date.
+     * See the table below for all accepted unit abbreviations:</p>
      *
      * <table>
-     *     <col width="30%"/>
-     *     <col width="10%"/>
-     *     <col width="60%"/>
-     *     <thead>
+     *   <col width="30%"/>
+     *   <col width="10%"/>
+     *   <col width="60%"/>
+     *   <thead>
      *     <tr>
-     *         <th>Unit</th>
-     *         <th></th>
-     *         <th>Abbreviation</th>
+     *       <th>Unit</th>
+     *       <th></th>
+     *       <th>Abbreviation</th>
      *     </tr>
-     *     </thead>
-     *     <tbody>
-     *      <tr>
-     *          <td>Millisecond</td>
-     *          <td></td>
-     *          <td>[ms, milli, millisecond, milliseconds]</td>
-     *      </tr>
-     *      <tr>
-     *          <td>Second</td>
-     *          <td></td>
-     *          <td>[s, sec, second, seconds]</td>
-     *      </tr>
-     *      <tr>
-     *          <td>Minute</td>
-     *          <td></td>
-     *          <td>[m, min, minute, minutes]</td>
-     *      </tr>
-     *      <tr>
-     *          <td>Hour</td>
-     *          <td></td>
-     *          <td>[h, hr, hour, hours]</td>
-     *      </tr>
-     *      <tr>
-     *          <td>Day</td>
-     *          <td></td>
-     *          <td>[d, day, days]</td>
-     *      </tr>
-     *      <tr>
-     *          <td>Week</td>
-     *          <td></td>
-     *          <td>[wk, week, weeks]</td>
-     *      </tr>
-     *      <tr>
-     *          <td>Month</td>
-     *          <td></td>
-     *          <td>[mo, month, months]</td>
-     *      </tr>
-     *      <tr>
-     *          <td>Year</td>
-     *          <td></td>
-     *          <td>[y, year, years]</td>
-     *      </tr>
+     *   </thead>
+     *   <tbody>
+     *     <tr>
+     *       <td>Millisecond</td>
+     *       <td></td>
+     *       <td>[ms, milli, millisecond, milliseconds]</td>
+     *     </tr>
+     *     <tr>
+     *       <td>Second</td>
+     *       <td></td>
+     *       <td>[s, sec, second, seconds]</td>
+     *     </tr>
+     *     <tr>
+     *       <td>Minute</td>
+     *       <td></td>
+     *       <td>[m, min, minute, minutes]</td>
+     *     </tr>
+     *     <tr>
+     *       <td>Hour</td>
+     *       <td></td>
+     *       <td>[h, hr, hour, hours]</td>
+     *     </tr>
+     *     <tr>
+     *       <td>Day</td>
+     *       <td></td>
+     *       <td>[d, day, days]</td>
+     *     </tr>
+     *     <tr>
+     *       <td>Week</td>
+     *       <td></td>
+     *       <td>[wk, week, weeks]</td>
+     *     </tr>
+     *     <tr>
+     *       <td>Month</td>
+     *       <td></td>
+     *       <td>[mo, month, months]</td>
+     *     </tr>
+     *     <tr>
+     *       <td>Year</td>
+     *       <td></td>
+     *       <td>[y, year, years]</td>
+     *     </tr>
      *   </tbody>
      * </table>
      *
-     * @param start The date that will be modified
-     * @param input The time that will be added to the start date
-     * @return The new date
-     * @throws IllegalArgumentException when an invalid input is entered
-     * @apiNote Decimal values are not allowed in the input, if you provide some, they will
-     * lose their decimal point, and we will add as usual.
+     * @param start the date that will be modified
+     * @param input the time to be added to the start date
+     * @return the new date
+     * @throws IllegalArgumentException if an invalid input is entered
+     * @apiNote Decimal values are not allowed in the input; if provided, they will be treated as whole numbers.
      */
     public static @NotNull Date add(@NotNull Date start, @NotNull String input) {
 
@@ -475,7 +479,7 @@ public final class Time {
      * parameter, please note that this format must match the format provided as the input.
      *
      * @param format Format representation of the input
-     * @param input Target date
+     * @param input  Target date
      * @return A date from a string
      * @throws IllegalArgumentException when this method fails to parse the input into a date
      */
@@ -849,7 +853,6 @@ public final class Time {
      *
      * <p>Please note that if a valid quantity could not be found, this method will return 0 in its place,
      * essentially rendering this method pointless</p>
-     *
      *
      * @param input Provided input
      * @return The quantity or "0"
