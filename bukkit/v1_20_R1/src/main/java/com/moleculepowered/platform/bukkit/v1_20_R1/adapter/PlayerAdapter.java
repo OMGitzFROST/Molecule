@@ -1,4 +1,5 @@
-package com.moleculepowered.platform.bukkit.v1_19_R3.adapter;
+package com.moleculepowered.platform.bukkit.v1_20_R1.adapter;
+
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -7,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Used to adapt player methods for Spigot 1.19.x
+ * Used to adapt player methods for Spigot 1.20.x
  *
  * @author OMGitzFROST
  */

@@ -1,11 +1,11 @@
-package com.moleculepowered.platform.bukkit.v1_19_R3.adapter;
+package com.moleculepowered.platform.bukkit.v1_20_R1.adapter;
 
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Used to adapt hover events for Spigot 1.19.x
+ * Used to adapt hover events for Spigot 1.20.x
  *
  * @author OMGitzFROST
  */

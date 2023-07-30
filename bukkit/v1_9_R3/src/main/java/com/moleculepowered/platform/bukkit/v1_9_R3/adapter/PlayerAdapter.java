@@ -1,13 +1,21 @@
-package com.moleculepowered.platform.bukkit.v1_19_R3.adapter;
+package com.moleculepowered.platform.bukkit.v1_9_R3.adapter;
 
+import com.moleculepowered.api.localization.i18n;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.server.v1_9_R2.ChatComponentText;
+import net.minecraft.server.v1_9_R2.IChatBaseComponent;
+import net.minecraft.server.v1_9_R2.PacketPlayOutChat;
+import net.minecraft.server.v1_9_R2.PacketPlayOutTitle;
+import net.minecraft.server.v1_9_R2.PlayerConnection;
+import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Used to adapt player methods for Spigot 1.19.x
+ * Used to adapt player methods for Spigot 1.9.x
  *
  * @author OMGitzFROST
  */
@@ -16,7 +24,7 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
 {
     private final Player player;
 
-    // TODO: 6/7/23 ADD JAVADOC
+    // TODO: 6/9/23 ADD JAVADOC
     public PlayerAdapter(@NotNull Player player) {
         this.player = player;
     }
@@ -27,8 +35,8 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
      * @return Player locale
      */
     @Override
-    public @NotNull String getLocale() {
-        return player.getLocale();
+    public String getLocale() {
+        return player.spigot().getLocale();
     }
 
     /**
@@ -38,7 +46,7 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
      */
     @Override
     public int getPing() {
-        return player.getPing();
+        return ((CraftPlayer) player).getHandle().ping;
     }
 
     /**
@@ -48,6 +56,8 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
      */
     @Override
     public void sendActionBar(String message) {
+        PacketPlayOutChat packet = new PacketPlayOutChat(new ChatComponentText(i18n.tl(message)), (byte) 2);
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));
     }
 
@@ -62,7 +72,7 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
      */
     @Override
     public void sendTitle(@Nullable String title, @Nullable String subtitle) {
-        player.sendTitle(title, subtitle, 10, 70, 20);
+        sendTitle(title, subtitle, 10, 70, 20);
     }
 
     /**
@@ -80,6 +90,28 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
      */
     @Override
     public void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int stay, int fadeOut) {
-        player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
+
+        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+
+        PacketPlayOutTitle packetPlayOutTimes = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadeIn, stay, fadeOut);
+        connection.sendPacket(packetPlayOutTimes);
+
+        if (subtitle != null) {
+            // TODO: 5/24/23 ADD PLACEHOLDER API HOOK
+            subtitle = subtitle.replaceAll("%player%", player.getDisplayName());
+            subtitle = ChatColor.translateAlternateColorCodes('&', subtitle);
+            IChatBaseComponent titleSub = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + i18n.tl(subtitle) + "\"}");
+            PacketPlayOutTitle packetPlayOutSubTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, titleSub);
+            connection.sendPacket(packetPlayOutSubTitle);
+        }
+
+        if (title != null) {
+            // TODO: 5/24/23 ADD PLACEHOLDER API HOOK
+            title = title.replaceAll("%player%", player.getDisplayName());
+            title = ChatColor.translateAlternateColorCodes('&', title);
+            IChatBaseComponent titleMain = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + i18n.tl(title) + "\"}");
+            PacketPlayOutTitle packetPlayOutTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, titleMain);
+            connection.sendPacket(packetPlayOutTitle);
+        }
     }
 }

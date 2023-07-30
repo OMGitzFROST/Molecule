@@ -18,11 +18,11 @@ import org.jetbrains.annotations.Nullable;
  * @author OMGitzFROST
  */
 @SuppressWarnings("unused")
-public final class PlayerAdapter implements com.moleculepowered.api.adapter.PlayerAdapter
+public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.adapter.PlayerAdapter
 {
-
     private final Player player;
 
+    // TODO: 6/9/23 ADD JAVADOC
     public PlayerAdapter(@NotNull Player player) {
         this.player = player;
     }
