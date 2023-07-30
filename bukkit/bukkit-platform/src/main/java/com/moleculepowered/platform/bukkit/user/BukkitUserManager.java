@@ -1,13 +1,12 @@
 package com.moleculepowered.platform.bukkit.user;
 
 import com.moleculepowered.api.user.UserManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * A {@link UserManager} class created for the bukkit platform, it handles all tasks related
@@ -15,12 +14,17 @@ import java.util.UUID;
  *
  * @author OMGitzFROST
  */
-public final class BukkitUserManager extends UserManager {
-
+public final class BukkitUserManager extends UserManager
+{
     private final File userDataFolder;
     private final Plugin plugin;
 
-    // TODO: 5/31/23 ADD JAVADOC
+    /**
+     * The main constructor for this manager system, it's used to initialize all required
+     * objects necessary for this class to work properly
+     *
+     * @param plugin Parent plugin
+     */
     public BukkitUserManager(@NotNull Plugin plugin) {
         this.plugin = plugin;
         this.userDataFolder = new File(plugin.getDataFolder(), "user-data");
@@ -37,13 +41,10 @@ public final class BukkitUserManager extends UserManager {
     public void onEnable() {
 
         // ENSURE USER DATA FOLDER EXISTS BEFORE ANYTHING
-        if (!userDataFolder.exists() && !userDataFolder.mkdirs()) {
-            throw new IllegalArgumentException("Failed to create user data folder");
-        }
+        if (!userDataFolder.exists() && !userDataFolder.mkdirs())
+            throw new IllegalArgumentException("An error occurred whilst attempting to create the user-data folder");
 
-        Arrays.stream(Objects.requireNonNull(userDataFolder.listFiles())).forEach(file -> {
-            UUID uuid = UUID.fromString(file.getName().replace(".yml", ""));
-            users.add(new BukkitUser(plugin, uuid));
-        });
+        // ADD ALL OFFLINE USERS TO OUR USER MAP
+        Arrays.stream(Bukkit.getOfflinePlayers()).forEach(p -> users.add(new BukkitUser(plugin, p)));
     }
 }
