@@ -22,6 +22,13 @@
             <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- NMS DEPENDENCIES -->
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_20_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
             <artifactId>v1_19_R3</artifactId>
@@ -29,7 +36,62 @@
         </dependency>
         <dependency>
             <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_18_R2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_17_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_16_R3</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_15_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_14_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_13_R2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_12_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_11_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_10_R1</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>v1_9_R3</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
             <artifactId>v1_8_R3</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.moleculepowered</groupId>
+            <artifactId>bukkit-common</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
