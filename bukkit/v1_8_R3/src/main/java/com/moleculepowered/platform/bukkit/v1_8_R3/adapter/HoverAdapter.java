@@ -5,7 +5,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Used to adapt hover events for Spigot 1.9.x
+ * Used to adapt hover events for Spigot 1.8.x
  *
  * @author OMGitzFROST
  */

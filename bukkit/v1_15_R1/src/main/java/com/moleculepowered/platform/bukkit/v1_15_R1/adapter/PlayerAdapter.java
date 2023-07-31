@@ -1,12 +1,8 @@
-package com.moleculepowered.platform.bukkit.v1_9_R3.adapter;
+package com.moleculepowered.platform.bukkit.v1_15_R1.adapter;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.v1_9_R2.IChatBaseComponent;
-import net.minecraft.server.v1_9_R2.PacketPlayOutTitle;
-import net.minecraft.server.v1_9_R2.PlayerConnection;
-import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import static com.moleculepowered.api.localization.i18n.tl;
 
 /**
- * Used to adapt player methods for Spigot 1.9.x
+ * Used to adapt player methods for Spigot 1.15.x
  *
  * @author OMGitzFROST
  */
@@ -34,8 +30,8 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
      * @return Player locale
      */
     @Override
-    public String getLocale() {
-        return player.spigot().getLocale();
+    public @NotNull String getLocale() {
+        return player.getLocale();
     }
 
     /**
@@ -87,28 +83,6 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
      */
     @Override
     public void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int stay, int fadeOut) {
-
-        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
-
-        PacketPlayOutTitle packetPlayOutTimes = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadeIn, stay, fadeOut);
-        connection.sendPacket(packetPlayOutTimes);
-
-        if (subtitle != null) {
-            // TODO: 5/24/23 ADD PLACEHOLDER API HOOK
-            subtitle = subtitle.replaceAll("%player%", player.getDisplayName());
-            subtitle = ChatColor.translateAlternateColorCodes('&', subtitle);
-            IChatBaseComponent titleSub = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + tl(subtitle) + "\"}");
-            PacketPlayOutTitle packetPlayOutSubTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, titleSub);
-            connection.sendPacket(packetPlayOutSubTitle);
-        }
-
-        if (title != null) {
-            // TODO: 5/24/23 ADD PLACEHOLDER API HOOK
-            title = title.replaceAll("%player%", player.getDisplayName());
-            title = ChatColor.translateAlternateColorCodes('&', title);
-            IChatBaseComponent titleMain = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + tl(title) + "\"}");
-            PacketPlayOutTitle packetPlayOutTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, titleMain);
-            connection.sendPacket(packetPlayOutTitle);
-        }
+        player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
     }
 }

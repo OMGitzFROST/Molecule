@@ -1,6 +1,5 @@
 package com.moleculepowered.platform.bukkit.v1_8_R3.adapter;
 
-import com.moleculepowered.api.localization.i18n;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
@@ -11,6 +10,8 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.moleculepowered.api.localization.i18n.tl;
 
 /**
  * Used to adapt player methods for Spigot 1.8.x
@@ -54,7 +55,7 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
      */
     @Override
     public void sendActionBar(String message) {
-        PacketPlayOutChat packet = new PacketPlayOutChat(new ChatComponentText(i18n.tl(message)), (byte) 2);
+        PacketPlayOutChat packet = new PacketPlayOutChat(new ChatComponentText(tl(message)), (byte) 2);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
     }
 
@@ -97,7 +98,7 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
             // TODO: 5/24/23 ADD PLACEHOLDER API HOOK
             subtitle = subtitle.replaceAll("%player%", player.getDisplayName());
             subtitle = ChatColor.translateAlternateColorCodes('&', subtitle);
-            IChatBaseComponent titleSub = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + i18n.tl(subtitle) + "\"}");
+            IChatBaseComponent titleSub = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + tl(subtitle) + "\"}");
             PacketPlayOutTitle packetPlayOutSubTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, titleSub);
             connection.sendPacket(packetPlayOutSubTitle);
         }
@@ -106,7 +107,7 @@ public final class PlayerAdapter implements com.moleculepowered.platform.bukkit.
             // TODO: 5/24/23 ADD PLACEHOLDER API HOOK
             title = title.replaceAll("%player%", player.getDisplayName());
             title = ChatColor.translateAlternateColorCodes('&', title);
-            IChatBaseComponent titleMain = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + i18n.tl(title) + "\"}");
+            IChatBaseComponent titleMain = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + tl(title) + "\"}");
             PacketPlayOutTitle packetPlayOutTitle = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, titleMain);
             connection.sendPacket(packetPlayOutTitle);
         }

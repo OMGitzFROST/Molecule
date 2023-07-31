@@ -1,11 +1,11 @@
-package com.moleculepowered.platform.bukkit.v1_9_R3.adapter;
+package com.moleculepowered.platform.bukkit.v1_17_R1.adapter;
 
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Used to adapt hover events for Spigot 1.9.x
+ * Used to adapt hover events for Spigot 1.17.x
  *
  * @author OMGitzFROST
  */
@@ -20,6 +20,6 @@ public final class HoverAdapter implements com.moleculepowered.platform.bukkit.a
      */
     @Override
     public @NotNull HoverEvent showText(Object value) {
-        return new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(join(value)).create());
+        return new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(join(value)));
     }
 }
